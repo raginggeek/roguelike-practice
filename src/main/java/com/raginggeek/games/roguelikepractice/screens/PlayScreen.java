@@ -27,7 +27,7 @@ public class PlayScreen implements Screen {
         int left = getScrollX();
         int top = getScrollY();
         displayTiles(terminal, left, top);
-        terminal.write(player.getGlyph(), player.getX() - left, player.getY() - top, player.getColor());
+        displayCreatures(terminal, left, top);
         terminal.writeCenter("-- press [escape] to lose or [enter] to win --", 22);
     }
 
@@ -84,6 +84,16 @@ public class PlayScreen implements Screen {
                 int wx = x + left;
                 int wy = y + top;
                 terminal.write(world.getGlyph(wx, wy), x, y, world.getColor(wx, wy));
+            }
+        }
+    }
+
+    private void displayCreatures(AsciiPanel terminal, int left, int top) {
+        if (world.getCreatures() != null) {
+            for (Creature c : world.getCreatures()) {
+                if (c.getX() >= left && c.getX() < left + screenWidth && c.getY() >= top && c.getY() < top + screenHeight) {
+                    terminal.write(c.getGlyph(), c.getX() - left, c.getY() - top, c.getColor());
+                }
             }
         }
     }

@@ -3,14 +3,18 @@ package com.raginggeek.games.roguelikepractice.world;
 import com.raginggeek.games.roguelikepractice.actors.Creature;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class World {
     private Tile[][] tiles;
     private int width;
     private int height;
+    private List<Creature> creatures;
 
     public World(Tile[][] tiles) {
         this.tiles = tiles;
+        this.creatures = new ArrayList<>();
         this.width = tiles.length;
         this.height = tiles[0].length;
     }
@@ -52,8 +56,24 @@ public class World {
         do {
             x = (int) (Math.random() * width);
             y = (int) (Math.random() * height);
-        } while (!tiles[x][y].isGround());
+        } while (!tiles[x][y].isGround() || getCreature(x, y) != null);
         creature.setX(x);
         creature.setY(y);
+        creatures.add(creature);
+    }
+
+    public Creature getCreature(int x, int y) {
+        if (creatures != null) {
+            for (Creature c : creatures) {
+                if (c.getX() == x && c.getY() == y) {
+                    return c;
+                }
+            }
+        }
+        return null;
+    }
+
+    public List<Creature> getCreatures() {
+        return creatures;
     }
 }
