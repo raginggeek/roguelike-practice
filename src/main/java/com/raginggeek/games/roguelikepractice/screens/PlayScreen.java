@@ -28,8 +28,6 @@ public class PlayScreen implements Screen {
         int top = getScrollY();
         displayTiles(terminal, left, top);
         terminal.write(player.getGlyph(), player.getX() - left, player.getY() - top, player.getColor());
-        terminal.write('X', player.getX() - left, player.getY() - top);
-        terminal.write("You are having fun.", 1, 1);
         terminal.writeCenter("-- press [escape] to lose or [enter] to win --", 22);
     }
 
