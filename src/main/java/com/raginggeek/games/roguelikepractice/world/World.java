@@ -1,5 +1,7 @@
 package com.raginggeek.games.roguelikepractice.world;
 
+import com.raginggeek.games.roguelikepractice.actors.Creature;
+
 import java.awt.*;
 
 public class World {
@@ -35,5 +37,23 @@ public class World {
 
     public Color getColor(int x, int y) {
         return getTile(x, y).getColor();
+    }
+
+    public void dig(int x, int y) {
+        if (tiles[x][y].isDiggable()) {
+            tiles[x][y] = Tile.FLOOR;
+        }
+    }
+
+    public void addAtEmptyLocation(Creature creature) {
+        int x;
+        int y;
+
+        do {
+            x = (int) (Math.random() * width);
+            y = (int) (Math.random() * height);
+        } while (!tiles[x][y].isGround());
+        creature.setX(x);
+        creature.setY(y);
     }
 }
