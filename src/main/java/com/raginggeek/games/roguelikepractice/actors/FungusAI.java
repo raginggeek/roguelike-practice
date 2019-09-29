@@ -3,6 +3,7 @@ package com.raginggeek.games.roguelikepractice.actors;
 import com.raginggeek.games.roguelikepractice.world.Tile;
 
 public class FungusAI extends CreatureAI {
+    protected static String NAME = "fungus";
     private CreatureFactory creatureFactory;
     private int spreadCount;
 
@@ -20,6 +21,13 @@ public class FungusAI extends CreatureAI {
         }
     }
 
+    public void onNotify(String message) {
+    }
+
+    public String getName() {
+        return NAME;
+    }
+
     private void spread() {
         int x = creature.getX() + (int) (Math.random() * 11) - 5;
         int y = creature.getY() + (int) (Math.random() * 11) - 5;
@@ -29,6 +37,7 @@ public class FungusAI extends CreatureAI {
             child.setX(x);
             child.setY(y);
             spreadCount++;
+            creature.doEvent("spawn a child");
         }
     }
 }

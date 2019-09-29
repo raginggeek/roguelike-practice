@@ -7,16 +7,20 @@ import com.raginggeek.games.roguelikepractice.world.World;
 import com.raginggeek.games.roguelikepractice.world.WorldBuilder;
 
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PlayScreen implements Screen {
     private World world;
     private Creature player;
     private int screenWidth;
     private int screenHeight;
+    private List<String> messages;
 
     public PlayScreen() {
         screenWidth = 80;
         screenHeight = 21;
+        messages = new ArrayList<>();
         createWorld();
         CreatureFactory creatureFactory = new CreatureFactory(world);
         createCreatures(creatureFactory);
@@ -29,6 +33,9 @@ public class PlayScreen implements Screen {
         displayTiles(terminal, left, top);
         displayCreatures(terminal, left, top);
         terminal.writeCenter("-- press [escape] to lose or [enter] to win --", 22);
+        String stats = String.format(" %3d/%3d hp", player.getHp(), player.getMaxHp());
+        displayMessages(terminal, messages);
+        terminal.write(stats, 1, 23);
     }
 
     @Override
@@ -104,9 +111,17 @@ public class PlayScreen implements Screen {
     }
 
     private void createCreatures(CreatureFactory creatureFactory) {
-        player = creatureFactory.newPlayer();
+        player = creatureFactory.newPlayer(messages);
         for (int i = 0; i < 8; i++) {
             creatureFactory.newFungus();
         }
+    }
+
+    private void displayMessages(AsciiPanel terminal, List<String> messages) {
+        int top = screenHeight - messages.size();
+        for (int i = 0; i < messages.size(); i++) {
+            terminal.writeCenter(messages.get(i), top + i);
+        }
+        messages.clear();
     }
 }
