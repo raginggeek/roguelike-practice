@@ -43,36 +43,44 @@ public class PlayScreen implements Screen {
         switch (key.getKeyCode()) {
             case KeyEvent.VK_LEFT:
             case KeyEvent.VK_H:
-                player.moveBy(-1, 0);
+                player.moveBy(-1, 0, 0);
                 break;
             case KeyEvent.VK_RIGHT:
             case KeyEvent.VK_L:
-                player.moveBy(1, 0);
+                player.moveBy(1, 0, 0);
                 break;
             case KeyEvent.VK_UP:
             case KeyEvent.VK_K:
-                player.moveBy(0, -1);
+                player.moveBy(0, -1, 0);
                 break;
             case KeyEvent.VK_DOWN:
             case KeyEvent.VK_J:
-                player.moveBy(0, 1);
+                player.moveBy(0, 1, 0);
                 break;
             case KeyEvent.VK_Y:
-                player.moveBy(-1, -1);
+                player.moveBy(-1, -1, 0);
                 break;
             case KeyEvent.VK_U:
-                player.moveBy(1, -1);
+                player.moveBy(1, -1, 0);
                 break;
             case KeyEvent.VK_B:
-                player.moveBy(-1, 1);
+                player.moveBy(-1, 1, 0);
                 break;
             case KeyEvent.VK_N:
-                player.moveBy(1, 1);
+                player.moveBy(1, 1, 0);
                 break;
             case KeyEvent.VK_ESCAPE:
                 return new LoseScreen();
             case KeyEvent.VK_ENTER:
                 return new WinScreen();
+        }
+        switch (key.getKeyChar()) {
+            case '<':
+                player.moveBy(0, 0, -1);
+                break;
+            case '>':
+                player.moveBy(0, 0, 1);
+                break;
         }
         world.update();
         return this;
@@ -91,7 +99,7 @@ public class PlayScreen implements Screen {
             for (int y = 0; y < screenHeight; y++) {
                 int wx = x + left;
                 int wy = y + top;
-                terminal.write(world.getGlyph(wx, wy), x, y, world.getColor(wx, wy));
+                terminal.write(world.getGlyph(wx, wy, player.getZ()), x, y, world.getColor(wx, wy, player.getZ()));
             }
         }
     }
@@ -99,7 +107,7 @@ public class PlayScreen implements Screen {
     private void displayCreatures(AsciiPanel terminal, int left, int top) {
         if (world.getCreatures() != null) {
             for (Creature c : world.getCreatures()) {
-                if (c.getX() >= left && c.getX() < left + screenWidth && c.getY() >= top && c.getY() < top + screenHeight) {
+                if (c.getX() >= left && c.getX() < left + screenWidth && c.getY() >= top && c.getY() < top + screenHeight && c.getZ() == player.getZ()) {
                     terminal.write(c.getGlyph(), c.getX() - left, c.getY() - top, c.getColor());
                 }
             }
@@ -107,13 +115,15 @@ public class PlayScreen implements Screen {
     }
 
     private void createWorld() {
-        world = new WorldBuilder(31, 90).makeCaves().build();
+        world = new WorldBuilder(31, 90, 5).makeCaves().build();
     }
 
     private void createCreatures(CreatureFactory creatureFactory) {
         player = creatureFactory.newPlayer(messages);
-        for (int i = 0; i < 8; i++) {
-            creatureFactory.newFungus();
+        for (int z = 0; z < world.getDepth(); z++) {
+            for (int i = 0; i < 8; i++) {
+                creatureFactory.newFungus(z);
+            }
         }
     }
 

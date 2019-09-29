@@ -15,7 +15,7 @@ public abstract class CreatureAI {
         return NAME;
     }
 
-    public abstract void onEnter(int x, int y, Tile tile);
+    public abstract void onEnter(int x, int y, int z, Tile tile);
 
     public abstract void onUpdate();
 

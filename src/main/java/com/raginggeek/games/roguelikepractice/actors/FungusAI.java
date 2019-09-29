@@ -12,7 +12,7 @@ public class FungusAI extends CreatureAI {
         this.creatureFactory = creatureFactory;
     }
 
-    public void onEnter(int x, int y, Tile tile) {
+    public void onEnter(int x, int y, int z, Tile tile) {
     } //fungi don't move
 
     public void onUpdate() {
@@ -31,9 +31,10 @@ public class FungusAI extends CreatureAI {
     private void spread() {
         int x = creature.getX() + (int) (Math.random() * 11) - 5;
         int y = creature.getY() + (int) (Math.random() * 11) - 5;
+        int z = creature.getZ();
 
-        if (creature.canEnter(x, y)) {
-            Creature child = creatureFactory.newFungus();
+        if (creature.canEnter(x, y, z)) {
+            Creature child = creatureFactory.newFungus(z);
             child.setX(x);
             child.setY(y);
             spreadCount++;

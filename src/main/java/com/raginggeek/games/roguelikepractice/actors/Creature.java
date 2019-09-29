@@ -1,5 +1,6 @@
 package com.raginggeek.games.roguelikepractice.actors;
 
+import com.raginggeek.games.roguelikepractice.world.Tile;
 import com.raginggeek.games.roguelikepractice.world.World;
 
 import java.awt.*;
@@ -9,6 +10,7 @@ public class Creature {
 
     private int x;
     private int y;
+    private int z;
     private char glyph;
     private String name;
     private Color color;
@@ -77,15 +79,41 @@ public class Creature {
         this.y = y;
     }
 
-    public void dig(int wx, int wy) {
-        this.world.dig(wx, wy);
+    public int getZ() {
+        return z;
     }
 
-    public void moveBy(int mx, int my) {
-        Creature opponent = world.getCreature(x + mx, y + my);
+    public void setZ(int z) {
+        this.z = z;
+    }
+
+    public void dig(int wx, int wy, int wz) {
+        this.world.dig(wx, wy, wz);
+    }
+
+    public void moveBy(int mx, int my, int mz) {
+        Tile tile = world.getTile(x + mx, y + my, z + mz);
+
+        if (mz == -1) {
+            if (tile == Tile.STAIRS_DOWN) {
+                doEvent("wall up the stairs to level %d", z + mz + 1);
+            } else {
+                doEvent("try to go up but are stopped by the cave ceiling");
+                return;
+            }
+        } else if (mz == 1) {
+            if (tile == Tile.STAIRS_UP) {
+                doEvent("walk down the stairs to level %d", z + mz + 1);
+            } else {
+                doEvent("try to go down but are stopped by the cave floor");
+                return;
+            }
+        }
+
+        Creature opponent = world.getCreature(x + mx, y + my, z + mz);
 
         if (opponent == null) {
-            ai.onEnter(x + mx, y + my, world.getTile(x + mx, y + my));
+            ai.onEnter(x + mx, y + my, z + mz, tile);
         } else {
             attack(opponent);
         }
@@ -109,8 +137,8 @@ public class Creature {
         }
     }
 
-    public boolean canEnter(int x, int y) {
-        return world.canEnter(x, y);
+    public boolean canEnter(int x, int y, int z) {
+        return world.canEnter(x, y, z);
     }
 
     public void update() {
@@ -126,7 +154,7 @@ public class Creature {
         for (int ox = -r; ox < r + 1; ox++) {
             for (int oy = -r; oy < r + 1; oy++) {
                 if (ox * ox + oy * oy <= r * r) {
-                    Creature other = world.getCreature(x + ox, y + oy);
+                    Creature other = world.getCreature(x + ox, y + oy, z);
                     if (other != null) {
                         if (other == this)
                             other.notify("You " + message + ".", params);
