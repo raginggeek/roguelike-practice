@@ -52,7 +52,25 @@ public class Creature {
     }
 
     public void moveBy(int mx, int my) {
-        ai.onEnter(x + mx, y + my, world.getTile(x + mx, y + my));
+        Creature opponent = world.getCreature(x + mx, y + my);
+
+        if (opponent == null) {
+            ai.onEnter(x + mx, y + my, world.getTile(x + mx, y + my));
+        } else {
+            attack(opponent);
+        }
+    }
+
+    public void attack(Creature opponent) {
+        world.removeCreature(opponent);
+    }
+
+    public boolean canEnter(int x, int y) {
+        return world.canEnter(x, y);
+    }
+
+    public void update() {
+        ai.onUpdate();
     }
 
 

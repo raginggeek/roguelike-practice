@@ -19,7 +19,7 @@ public class PlayScreen implements Screen {
         screenHeight = 21;
         createWorld();
         CreatureFactory creatureFactory = new CreatureFactory(world);
-        player = creatureFactory.newPlayer();
+        createCreatures(creatureFactory);
     }
 
     @Override
@@ -67,6 +67,7 @@ public class PlayScreen implements Screen {
             case KeyEvent.VK_ENTER:
                 return new WinScreen();
         }
+        world.update();
         return this;
     }
 
@@ -100,5 +101,12 @@ public class PlayScreen implements Screen {
 
     private void createWorld() {
         world = new WorldBuilder(31, 90).makeCaves().build();
+    }
+
+    private void createCreatures(CreatureFactory creatureFactory) {
+        player = creatureFactory.newPlayer();
+        for (int i = 0; i < 8; i++) {
+            creatureFactory.newFungus();
+        }
     }
 }

@@ -15,4 +15,8 @@ public class PlayerAI extends CreatureAI {
             creature.dig(x, y);
         }
     }
+
+    public void onUpdate() {
+
+    }
 }

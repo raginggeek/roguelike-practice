@@ -56,7 +56,7 @@ public class World {
         do {
             x = (int) (Math.random() * width);
             y = (int) (Math.random() * height);
-        } while (!tiles[x][y].isGround() || getCreature(x, y) != null);
+        } while (!canEnter(x, y));
         creature.setX(x);
         creature.setY(y);
         creatures.add(creature);
@@ -75,5 +75,20 @@ public class World {
 
     public List<Creature> getCreatures() {
         return creatures;
+    }
+
+    public void removeCreature(Creature creature) {
+        creatures.remove(creature);
+    }
+
+    public boolean canEnter(int x, int y) {
+        return x > 0 && x < width && y > 0 && y < height && tiles[x][y].isGround() && getCreature(x, y) == null;
+    }
+
+    public void update() {
+        List<Creature> toUpdate = new ArrayList<>(creatures);
+        for (Creature creature : toUpdate) {
+            creature.update();
+        }
     }
 }

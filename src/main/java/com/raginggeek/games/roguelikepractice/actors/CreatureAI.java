@@ -2,7 +2,7 @@ package com.raginggeek.games.roguelikepractice.actors;
 
 import com.raginggeek.games.roguelikepractice.world.Tile;
 
-public class CreatureAI {
+public abstract class CreatureAI {
     protected Creature creature;
 
     public CreatureAI(Creature creature) {
@@ -10,7 +10,7 @@ public class CreatureAI {
         this.creature.setCreatureAi(this);
     }
 
-    public void onEnter(int x, int y, Tile tile) {
+    public abstract void onEnter(int x, int y, Tile tile);
 
-    }
+    public abstract void onUpdate();
 }
