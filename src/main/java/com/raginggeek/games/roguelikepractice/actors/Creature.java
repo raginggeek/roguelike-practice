@@ -19,6 +19,7 @@ public class Creature {
     private int hp;
     private int attackValue;
     private int defenseValue;
+    private int visionRadius;
 
     public Creature(World world, char glyph, Color color, int maxHp, int attack, int defense) {
         this.world = world;
@@ -28,6 +29,7 @@ public class Creature {
         this.hp = maxHp;
         this.attackValue = attack;
         this.defenseValue = defense;
+        this.visionRadius = 9;
     }
 
     public int getMaxHp() {
@@ -158,7 +160,7 @@ public class Creature {
                     if (other != null) {
                         if (other == this)
                             other.notify("You " + message + ".", params);
-                        else {
+                        else if (other.canSee(x, y, z)) {
                             other.notify(String.format(
                                     "The '%s' %s.",
                                     name, makeSecondPerson(message)),
@@ -180,5 +182,17 @@ public class Creature {
             builder.append(word);
         }
         return builder.toString().trim();
+    }
+
+    public boolean canSee(int wx, int wy, int wz) {
+        return ai.canSee(wx, wy, wz);
+    }
+
+    public Tile getTile(int wx, int wy, int wz) {
+        return world.getTile(wx, wy, wz);
+    }
+
+    public int getVisionRadius() {
+        return visionRadius;
     }
 }

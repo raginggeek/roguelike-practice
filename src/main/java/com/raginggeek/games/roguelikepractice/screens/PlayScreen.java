@@ -3,9 +3,11 @@ package com.raginggeek.games.roguelikepractice.screens;
 import asciiPanel.AsciiPanel;
 import com.raginggeek.games.roguelikepractice.actors.Creature;
 import com.raginggeek.games.roguelikepractice.actors.CreatureFactory;
+import com.raginggeek.games.roguelikepractice.actors.FieldOfView;
 import com.raginggeek.games.roguelikepractice.world.World;
 import com.raginggeek.games.roguelikepractice.world.WorldBuilder;
 
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +18,7 @@ public class PlayScreen implements Screen {
     private int screenWidth;
     private int screenHeight;
     private List<String> messages;
+    private FieldOfView fov;
 
     public PlayScreen() {
         screenWidth = 80;
@@ -95,11 +98,17 @@ public class PlayScreen implements Screen {
     }
 
     private void displayTiles(AsciiPanel terminal, int left, int top) {
+        fov.update(player.getX(), player.getY(), player.getZ(), player.getVisionRadius());
         for (int x = 0; x < screenWidth; x++) {
             for (int y = 0; y < screenHeight; y++) {
                 int wx = x + left;
                 int wy = y + top;
-                terminal.write(world.getGlyph(wx, wy, player.getZ()), x, y, world.getColor(wx, wy, player.getZ()));
+                if (player.canSee(wx, wy, player.getZ())) {
+                    terminal.write(world.getGlyph(wx, wy, player.getZ()), x, y, world.getColor(wx, wy, player.getZ()));
+                } else {
+                    terminal.write(fov.getTile(wx, wy, player.getZ()).getGlyph(), x, y, Color.darkGray);
+                }
+
             }
         }
     }
@@ -119,7 +128,8 @@ public class PlayScreen implements Screen {
     }
 
     private void createCreatures(CreatureFactory creatureFactory) {
-        player = creatureFactory.newPlayer(messages);
+        fov = new FieldOfView(world);
+        player = creatureFactory.newPlayer(messages, fov);
         for (int z = 0; z < world.getDepth(); z++) {
             for (int i = 0; i < 8; i++) {
                 creatureFactory.newFungus(z);

@@ -42,11 +42,13 @@ public class World {
     }
 
     public char getGlyph(int x, int y, int z) {
-        return getTile(x, y, z).getGlyph();
+        Creature creature = getCreature(x, y, z);
+        return creature != null ? creature.getGlyph() : getTile(x, y, z).getGlyph();
     }
 
     public Color getColor(int x, int y, int z) {
-        return getTile(x, y, z).getColor();
+        Creature creature = getCreature(x, y, z);
+        return creature != null ? creature.getColor() : getTile(x, y, z).getColor();
     }
 
     public void dig(int x, int y, int z) {
