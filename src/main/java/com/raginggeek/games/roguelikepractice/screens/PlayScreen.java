@@ -1,9 +1,12 @@
 package com.raginggeek.games.roguelikepractice.screens;
 
 import asciiPanel.AsciiPanel;
-import com.raginggeek.games.roguelikepractice.actors.Creature;
-import com.raginggeek.games.roguelikepractice.actors.CreatureFactory;
-import com.raginggeek.games.roguelikepractice.actors.FieldOfView;
+import com.raginggeek.games.roguelikepractice.entities.actors.Creature;
+import com.raginggeek.games.roguelikepractice.entities.actors.CreatureFactory;
+import com.raginggeek.games.roguelikepractice.entities.actors.capabilities.FieldOfView;
+import com.raginggeek.games.roguelikepractice.entities.items.Item;
+import com.raginggeek.games.roguelikepractice.entities.items.ItemFactory;
+import com.raginggeek.games.roguelikepractice.world.Tile;
 import com.raginggeek.games.roguelikepractice.world.World;
 import com.raginggeek.games.roguelikepractice.world.WorldBuilder;
 
@@ -19,6 +22,7 @@ public class PlayScreen implements Screen {
     private int screenHeight;
     private List<String> messages;
     private FieldOfView fov;
+    private Screen subscreen;
 
     public PlayScreen() {
         screenWidth = 80;
@@ -26,7 +30,9 @@ public class PlayScreen implements Screen {
         messages = new ArrayList<>();
         createWorld();
         CreatureFactory creatureFactory = new CreatureFactory(world);
+        ItemFactory itemFactory = new ItemFactory(world);
         createCreatures(creatureFactory);
+        createItems(itemFactory);
     }
 
     @Override
@@ -38,6 +44,9 @@ public class PlayScreen implements Screen {
         String stats = String.format(" %3d/%3d hp", player.getHp(), player.getMaxHp());
         displayMessages(terminal, messages);
         terminal.write(stats, 1, 23);
+        if (subscreen != null) {
+            subscreen.displayOutput(terminal);
+        }
     }
 
     @Override
@@ -71,16 +80,29 @@ public class PlayScreen implements Screen {
             case KeyEvent.VK_N:
                 player.moveBy(1, 1, 0);
                 break;
+            case KeyEvent.VK_D:
+                subscreen = new DropScreen(player);
+                break;
         }
         switch (key.getKeyChar()) {
             case '<':
-                player.moveBy(0, 0, -1);
+                if (userIsTryingToExit()) {
+                    return userExits();
+                } else {
+                    player.moveBy(0, 0, -1);
+                }
                 break;
             case '>':
                 player.moveBy(0, 0, 1);
                 break;
+            case 'g':
+            case ',':
+                player.pickup();
+                break;
         }
-        world.update();
+        if (subscreen == null) {
+            world.update();
+        }
         if (player.getHp() < 1) {
             return new LoseScreen();
         }
@@ -138,11 +160,35 @@ public class PlayScreen implements Screen {
         }
     }
 
+    private void createItems(ItemFactory itemFactory) {
+        for (int z = 0; z < world.getDepth(); z++) {
+            for (int i = 0; i < world.getWidth() * world.getHeight() / 20; i++) {
+                itemFactory.newRock(z);
+            }
+        }
+
+        itemFactory.newMcGuffin(world.getDepth() - 1);
+    }
+
     private void displayMessages(AsciiPanel terminal, List<String> messages) {
         int top = screenHeight - messages.size();
         for (int i = 0; i < messages.size(); i++) {
             terminal.writeCenter(messages.get(i), top + i);
         }
         messages.clear();
+    }
+
+    private boolean userIsTryingToExit() {
+        return player.getZ() == 0 &&
+                world.getTile(player.getX(), player.getY(), player.getZ()) == Tile.STAIRS_UP;
+    }
+
+    private Screen userExits() {
+        for (Item item : player.getInventory().getItems()) {
+            if (item != null && item.getName().equals("Holy Relic")) {
+                return new WinScreen();
+            }
+        }
+        return new LoseScreen();
     }
 }

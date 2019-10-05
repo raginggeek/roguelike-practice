@@ -1,11 +1,15 @@
-package com.raginggeek.games.roguelikepractice.actors;
+package com.raginggeek.games.roguelikepractice.entities.actors;
 
+import com.raginggeek.games.roguelikepractice.entities.Entity;
+import com.raginggeek.games.roguelikepractice.entities.actors.ai.CreatureAI;
+import com.raginggeek.games.roguelikepractice.entities.actors.capabilities.Inventory;
+import com.raginggeek.games.roguelikepractice.entities.items.Item;
 import com.raginggeek.games.roguelikepractice.world.Tile;
 import com.raginggeek.games.roguelikepractice.world.World;
 
 import java.awt.*;
 
-public class Creature {
+public class Creature implements Entity {
     private World world;
 
     private int x;
@@ -20,6 +24,7 @@ public class Creature {
     private int attackValue;
     private int defenseValue;
     private int visionRadius;
+    private Inventory inventory;
 
     public Creature(World world, char glyph, Color color, int maxHp, int attack, int defense) {
         this.world = world;
@@ -30,6 +35,7 @@ public class Creature {
         this.attackValue = attack;
         this.defenseValue = defense;
         this.visionRadius = 9;
+        this.inventory = new Inventory(20);
     }
 
     public int getMaxHp() {
@@ -201,5 +207,31 @@ public class Creature {
 
     public Creature getWorldCreature(int wx, int wy, int wz) {
         return world.getCreature(wx, wy, wz);
+    }
+
+    public Inventory getInventory() {
+        return inventory;
+    }
+
+    public void pickup() {
+        Item item = world.getItem(x, y, z);
+
+        if (inventory.isFull() || item == null) {
+            doEvent("grab at the ground");
+        } else {
+            doEvent("pickup a %s", item.getName());
+            world.remove(x, y, z);
+            inventory.add(item);
+        }
+    }
+
+    public void drop(Item item) {
+        doEvent("drop a " + item.getName());
+        if (world.addAtEmptySpace(item, x, y, z)) {
+            doEvent("drop a " + item.getName());
+            inventory.remove(item);
+        } else {
+            notify("There's nowhere to drop the %s.", item.getName());
+        }
     }
 }

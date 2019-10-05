@@ -1,4 +1,4 @@
-package com.raginggeek.games.roguelikepractice.actors;
+package com.raginggeek.games.roguelikepractice.entities.actors.capabilities;
 
 import com.raginggeek.games.roguelikepractice.world.Line;
 import com.raginggeek.games.roguelikepractice.world.Point;

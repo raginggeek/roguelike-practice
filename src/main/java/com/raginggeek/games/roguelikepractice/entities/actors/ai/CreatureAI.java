@@ -1,5 +1,6 @@
-package com.raginggeek.games.roguelikepractice.actors;
+package com.raginggeek.games.roguelikepractice.entities.actors.ai;
 
+import com.raginggeek.games.roguelikepractice.entities.actors.Creature;
 import com.raginggeek.games.roguelikepractice.world.Line;
 import com.raginggeek.games.roguelikepractice.world.Point;
 import com.raginggeek.games.roguelikepractice.world.Tile;

@@ -1,4 +1,6 @@
-package com.raginggeek.games.roguelikepractice.actors;
+package com.raginggeek.games.roguelikepractice.entities.actors.ai;
+
+import com.raginggeek.games.roguelikepractice.entities.actors.Creature;
 
 public class BatAI extends CreatureAI {
 

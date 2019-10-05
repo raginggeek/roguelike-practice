@@ -1,6 +1,8 @@
 package com.raginggeek.games.roguelikepractice.world;
 
-import com.raginggeek.games.roguelikepractice.actors.Creature;
+import com.raginggeek.games.roguelikepractice.entities.Entity;
+import com.raginggeek.games.roguelikepractice.entities.actors.Creature;
+import com.raginggeek.games.roguelikepractice.entities.items.Item;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -8,6 +10,7 @@ import java.util.List;
 
 public class World {
     private Tile[][][] tiles;
+    private Item[][][] items;
     private int width;
     private int height;
     private int depth;
@@ -19,6 +22,7 @@ public class World {
         this.width = tiles.length;
         this.height = tiles[0].length;
         this.depth = tiles[0][0].length;
+        this.items = new Item[width][height][depth];
     }
 
     public int getWidth() {
@@ -43,12 +47,28 @@ public class World {
 
     public char getGlyph(int x, int y, int z) {
         Creature creature = getCreature(x, y, z);
-        return creature != null ? creature.getGlyph() : getTile(x, y, z).getGlyph();
+        if (creature != null) {
+            return creature.getGlyph();
+        }
+
+        if (getItem(x, y, z) != null) {
+            return getItem(x, y, z).getGlyph();
+        }
+
+        return getTile(x, y, z).getGlyph();
     }
 
     public Color getColor(int x, int y, int z) {
         Creature creature = getCreature(x, y, z);
-        return creature != null ? creature.getColor() : getTile(x, y, z).getColor();
+        if (creature != null) {
+            return creature.getColor();
+        }
+
+        if (getItem(x, y, z) != null) {
+            return getItem(x, y, z).getColor();
+        }
+
+        return getTile(x, y, z).getColor();
     }
 
     public void dig(int x, int y, int z) {
@@ -57,7 +77,7 @@ public class World {
         }
     }
 
-    public void addAtEmptyLocation(Creature creature, int z) {
+    public void addAtEmptyLocation(Entity entity, int z) {
         int x;
         int y;
 
@@ -65,10 +85,19 @@ public class World {
             x = (int) (Math.random() * width);
             y = (int) (Math.random() * height);
         } while (!canEnter(x, y, z));
-        creature.setX(x);
-        creature.setY(y);
-        creature.setZ(z);
-        creatures.add(creature);
+
+        if (entity instanceof Creature) {
+            Creature creature = (Creature) entity;
+            creature.setX(x);
+            creature.setY(y);
+            creature.setZ(z);
+            creatures.add(creature);
+        }
+        if (entity instanceof Item) {
+            Item item = (Item) entity;
+            items[x][y][z] = item;
+        }
+
     }
 
     public Creature getCreature(int x, int y, int z) {
@@ -80,6 +109,10 @@ public class World {
             }
         }
         return null;
+    }
+
+    public Item getItem(int x, int y, int z) {
+        return items[x][y][z];
     }
 
     public List<Creature> getCreatures() {
@@ -99,5 +132,41 @@ public class World {
         for (Creature creature : toUpdate) {
             creature.update();
         }
+    }
+
+    public void remove(int x, int y, int z) {
+        items[x][y][z] = null;
+    }
+
+    public boolean addAtEmptySpace(Item item, int x, int y, int z) {
+        if (item == null) {
+            return true;
+        }
+        List<Point> points = new ArrayList<>();
+        List<Point> checked = new ArrayList<>();
+
+        points.add(new Point(x, y, z));
+
+        while (!points.isEmpty()) {
+            Point p = points.remove(0);
+            checked.add(p);
+            if (!getTile(p.getX(), p.getY(), p.getZ()).isGround()) {
+                continue;
+            }
+
+            if (items[p.getX()][p.getY()][p.getZ()] == null) {
+                items[p.getX()][p.getY()][p.getZ()] = item;
+                Creature c = this.getCreature(p.getX(), p.getY(), p.getZ());
+                if (c != null) {
+                    c.doEvent("A %s lands between your feet.", item.getName());
+                }
+                return true;
+            } else {
+                List<Point> neighbors = p.neighbors8();
+                neighbors.removeAll(checked);
+                points.addAll(neighbors);
+            }
+        }
+        return false;
     }
 }

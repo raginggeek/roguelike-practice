@@ -1,6 +1,10 @@
-package com.raginggeek.games.roguelikepractice.actors;
+package com.raginggeek.games.roguelikepractice.entities.actors;
 
 import asciiPanel.AsciiPanel;
+import com.raginggeek.games.roguelikepractice.entities.actors.ai.BatAI;
+import com.raginggeek.games.roguelikepractice.entities.actors.ai.FungusAI;
+import com.raginggeek.games.roguelikepractice.entities.actors.ai.PlayerAI;
+import com.raginggeek.games.roguelikepractice.entities.actors.capabilities.FieldOfView;
 import com.raginggeek.games.roguelikepractice.world.World;
 
 import java.util.List;
