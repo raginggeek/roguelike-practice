@@ -35,7 +35,6 @@ public class PlayScreen implements Screen {
         int top = getScrollY();
         displayTiles(terminal, left, top);
         displayCreatures(terminal, left, top);
-        terminal.writeCenter("-- press [escape] to lose or [enter] to win --", 22);
         String stats = String.format(" %3d/%3d hp", player.getHp(), player.getMaxHp());
         displayMessages(terminal, messages);
         terminal.write(stats, 1, 23);
@@ -72,10 +71,6 @@ public class PlayScreen implements Screen {
             case KeyEvent.VK_N:
                 player.moveBy(1, 1, 0);
                 break;
-            case KeyEvent.VK_ESCAPE:
-                return new LoseScreen();
-            case KeyEvent.VK_ENTER:
-                return new WinScreen();
         }
         switch (key.getKeyChar()) {
             case '<':
@@ -86,6 +81,9 @@ public class PlayScreen implements Screen {
                 break;
         }
         world.update();
+        if (player.getHp() < 1) {
+            return new LoseScreen();
+        }
         return this;
     }
 
@@ -133,6 +131,9 @@ public class PlayScreen implements Screen {
         for (int z = 0; z < world.getDepth(); z++) {
             for (int i = 0; i < 8; i++) {
                 creatureFactory.newFungus(z);
+            }
+            for (int i = 0; i < 20; i++) {
+                creatureFactory.newBat(z);
             }
         }
     }

@@ -94,6 +94,9 @@ public class Creature {
     }
 
     public void moveBy(int mx, int my, int mz) {
+        if (mx == 0 && my == 0 && mz == 0) {
+            return;
+        }
         Tile tile = world.getTile(x + mx, y + my, z + mz);
 
         if (mz == -1) {
@@ -156,7 +159,7 @@ public class Creature {
         for (int ox = -r; ox < r + 1; ox++) {
             for (int oy = -r; oy < r + 1; oy++) {
                 if (ox * ox + oy * oy <= r * r) {
-                    Creature other = world.getCreature(x + ox, y + oy, z);
+                    Creature other = getWorldCreature(x + ox, y + oy, z);
                     if (other != null) {
                         if (other == this)
                             other.notify("You " + message + ".", params);
@@ -194,5 +197,9 @@ public class Creature {
 
     public int getVisionRadius() {
         return visionRadius;
+    }
+
+    public Creature getWorldCreature(int wx, int wy, int wz) {
+        return world.getCreature(wx, wy, wz);
     }
 }

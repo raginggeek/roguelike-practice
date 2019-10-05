@@ -5,16 +5,23 @@ import com.raginggeek.games.roguelikepractice.world.Point;
 import com.raginggeek.games.roguelikepractice.world.Tile;
 
 public abstract class CreatureAI {
-    protected static String NAME = "creature";
+    protected String name;
     protected Creature creature;
 
     public CreatureAI(Creature creature) {
+        this.name = "creature";
+        this.creature = creature;
+        this.creature.setCreatureAi(this);
+    }
+
+    public CreatureAI(Creature creature, String name) {
+        this.name = name;
         this.creature = creature;
         this.creature.setCreatureAi(this);
     }
 
     public String getName() {
-        return NAME;
+        return this.name;
     }
 
     public boolean canSee(int wx, int wy, int wz) {
@@ -37,7 +44,30 @@ public abstract class CreatureAI {
         return true;
     }
 
-    public abstract void onEnter(int x, int y, int z, Tile tile);
+    public void onEnter(int x, int y, int z, Tile tile) {
+        if (tile.isGround()) {
+            creature.setX(x);
+            creature.setY(y);
+            creature.setZ(z);
+        } else {
+            creature.doEvent("bump into a wall");
+        }
+    }
+
+    public void wander() {
+        int mx = (int) (Math.random() * 3) - 1;
+        int my = (int) (Math.random() * 3) - 1;
+
+        Creature other = creature.getWorldCreature(creature.getX() + mx,
+                creature.getY() + my,
+                creature.getZ());
+
+        if (other != null && other.getGlyph() == creature.getGlyph()) {
+            return;
+        } else {
+            creature.moveBy(mx, my, 0);
+        }
+    }
 
     public abstract void onUpdate();
 

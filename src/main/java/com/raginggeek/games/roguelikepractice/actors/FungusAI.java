@@ -3,12 +3,11 @@ package com.raginggeek.games.roguelikepractice.actors;
 import com.raginggeek.games.roguelikepractice.world.Tile;
 
 public class FungusAI extends CreatureAI {
-    protected static String NAME = "fungus";
     private CreatureFactory creatureFactory;
     private int spreadCount;
 
     public FungusAI(Creature creature, CreatureFactory creatureFactory) {
-        super(creature);
+        super(creature, "fungus");
         this.creatureFactory = creatureFactory;
     }
 
@@ -22,10 +21,6 @@ public class FungusAI extends CreatureAI {
     }
 
     public void onNotify(String message) {
-    }
-
-    public String getName() {
-        return NAME;
     }
 
     private void spread() {
