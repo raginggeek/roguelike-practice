@@ -59,7 +59,7 @@ public abstract class InventoryScreen implements Screen {
         return lines;
     }
 
-    public Screen responseToUserInput(KeyEvent key) {
+    public Screen respondToUserInput(KeyEvent key) {
         char c = key.getKeyChar();
         Item[] items = player.getInventory().getItems();
 
