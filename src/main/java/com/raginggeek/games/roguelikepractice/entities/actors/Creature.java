@@ -25,6 +25,8 @@ public class Creature implements Entity {
     private int defenseValue;
     private int visionRadius;
     private Inventory inventory;
+    private int maxFood;
+    private int food;
 
     public Creature(World world, char glyph, Color color, int maxHp, int attack, int defense) {
         this.world = world;
@@ -36,6 +38,32 @@ public class Creature implements Entity {
         this.defenseValue = defense;
         this.visionRadius = 9;
         this.inventory = new Inventory(20);
+        this.maxFood = 1000;
+        this.food = maxFood / 3 * 2;
+    }
+
+    public int getMaxFood() {
+        return maxFood;
+    }
+
+    public int getFood() {
+        return food;
+    }
+
+    public void modifyFood(int amount) {
+        food += amount;
+        if (food > maxFood) {
+            maxFood = maxFood + food / 2;
+            food = maxFood;
+            notify("You can't believe your stomach can hold that much!");
+            modifyHp(-1);
+        } else if (food < 1 && isPlayer()) {
+            modifyHp(-1000);
+        }
+    }
+
+    public boolean isPlayer() {
+        return glyph == '@';
     }
 
     public int getMaxHp() {
@@ -96,7 +124,9 @@ public class Creature implements Entity {
     }
 
     public void dig(int wx, int wy, int wz) {
+        modifyFood(-10);
         this.world.dig(wx, wy, wz);
+        doEvent("dig");
     }
 
     public void moveBy(int mx, int my, int mz) {
@@ -142,8 +172,11 @@ public class Creature implements Entity {
     public void modifyHp(int amount) {
         hp += amount;
 
-        if (hp < 1) {
+        if (hp > maxHp) {
+            hp = maxHp;
+        } else if (hp < 1) {
             doEvent("die");
+            leaveCorpse();
             world.removeCreature(this);
         }
     }
@@ -153,6 +186,7 @@ public class Creature implements Entity {
     }
 
     public void update() {
+        modifyFood(-1);
         ai.onUpdate();
     }
 
@@ -233,5 +267,16 @@ public class Creature implements Entity {
         } else {
             notify("There's nowhere to drop the %s.", item.getName());
         }
+    }
+
+    public void leaveCorpse() {
+        Item corpse = new Item('%', color, name + " corpse");
+        corpse.modifyFoodValue(maxHp * 3);
+        world.addAtEmptySpace(corpse, x, y, z);
+    }
+
+    public void eat(Item item) {
+        modifyFood(item.getFoodValue());
+        inventory.remove(item);
     }
 }

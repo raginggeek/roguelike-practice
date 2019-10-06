@@ -8,6 +8,7 @@ public class Item implements Entity {
     private char glyph;
     private Color color;
     private String name;
+    private int foodValue;
 
     public Item(char glyph, Color color, String name) {
         this.glyph = glyph;
@@ -25,5 +26,13 @@ public class Item implements Entity {
 
     public String getName() {
         return name;
+    }
+
+    public int getFoodValue() {
+        return foodValue;
+    }
+
+    public void modifyFoodValue(int amount) {
+        foodValue += amount;
     }
 }
