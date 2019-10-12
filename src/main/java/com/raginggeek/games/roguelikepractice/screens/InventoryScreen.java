@@ -54,6 +54,10 @@ public abstract class InventoryScreen implements Screen {
 
             String line = letters.charAt(i) + " - " + item.getGlyph() + " " + item.getName();
 
+            if (item == player.getWeapon() || item == player.getArmor()) {
+                line += " (equipped)";
+            }
+
             lines.add(line);
         }
         return lines;

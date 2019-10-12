@@ -89,6 +89,9 @@ public class PlayScreen implements Screen {
                 case KeyEvent.VK_E:
                     subscreen = new EatScreen(player);
                     break;
+                case KeyEvent.VK_W:
+                    subscreen = new EquipScreen(player);
+                    break;
             }
             switch (key.getKeyChar()) {
                 case '<':
@@ -172,6 +175,12 @@ public class PlayScreen implements Screen {
         for (int z = 0; z < world.getDepth(); z++) {
             for (int i = 0; i < world.getWidth() * world.getHeight() / 20; i++) {
                 itemFactory.newRock(z);
+            }
+            for (int i = 0; i < world.getWidth() * world.getHeight() / 640; i++) {
+                itemFactory.randomWeapon(z);
+            }
+            for (int i = 0; i < world.getWidth() * world.getHeight() / 640; i++) {
+                itemFactory.randomArmor(z);
             }
         }
 

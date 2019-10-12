@@ -27,6 +27,8 @@ public class Creature implements Entity {
     private Inventory inventory;
     private int maxFood;
     private int food;
+    private Item weapon;
+    private Item armor;
 
     public Creature(World world, char glyph, Color color, int maxHp, int attack, int defense) {
         this.world = world;
@@ -75,11 +77,15 @@ public class Creature implements Entity {
     }
 
     public int getAttackValue() {
-        return attackValue;
+        return attackValue +
+                (weapon == null ? 0 : weapon.getAttackValue()) +
+                (armor == null ? 0 : armor.getAttackValue());
     }
 
     public int getDefenseValue() {
-        return defenseValue;
+        return defenseValue +
+                (armor == null ? 0 : armor.getDefenseValue()) +
+                (weapon == null ? 0 : weapon.getDefenseValue());
     }
 
     public String getName() {
@@ -260,10 +266,10 @@ public class Creature implements Entity {
     }
 
     public void drop(Item item) {
-        doEvent("drop a " + item.getName());
         if (world.addAtEmptySpace(item, x, y, z)) {
             doEvent("drop a " + item.getName());
             inventory.remove(item);
+            unEquip(item);
         } else {
             notify("There's nowhere to drop the %s.", item.getName());
         }
@@ -276,7 +282,44 @@ public class Creature implements Entity {
     }
 
     public void eat(Item item) {
+        if (item.getFoodValue() < 0) {
+            notify("Gross!");
+        }
         modifyFood(item.getFoodValue());
         inventory.remove(item);
+        unEquip(item);
+    }
+
+    public Item getWeapon() {
+        return weapon;
+    }
+
+    public Item getArmor() {
+        return armor;
+    }
+
+    public void unEquip(Item item) {
+        if (item != null) {
+            if (item == armor) {
+                doEvent("unequipped a " + item.getName());
+            } else if (item == weapon) {
+                doEvent("put away a " + item.getName());
+                weapon = null;
+            }
+        }
+    }
+
+    public void equip(Item item) {
+        if (item.getAttackValue() != 0 || item.getDefenseValue() != 0) {
+            if (item.getAttackValue() >= item.getDefenseValue()) {
+                unEquip(weapon);
+                doEvent("wield a " + item.getName());
+                weapon = item;
+            } else {
+                unEquip(armor);
+                doEvent("put on a " + item.getName());
+                armor = item;
+            }
+        }
     }
 }

@@ -9,6 +9,8 @@ public class Item implements Entity {
     private Color color;
     private String name;
     private int foodValue;
+    private int attackValue;
+    private int defenseValue;
 
     public Item(char glyph, Color color, String name) {
         this.glyph = glyph;
@@ -34,5 +36,21 @@ public class Item implements Entity {
 
     public void modifyFoodValue(int amount) {
         foodValue += amount;
+    }
+
+    public int getAttackValue() {
+        return attackValue;
+    }
+
+    public void modifyAttackValue(int amount) {
+        attackValue += amount;
+    }
+
+    public int getDefenseValue() {
+        return defenseValue;
+    }
+
+    public void modifyDefenseValue(int amount) {
+        defenseValue += amount;
     }
 }
