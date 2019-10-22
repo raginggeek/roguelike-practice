@@ -4,6 +4,7 @@ import asciiPanel.AsciiPanel;
 import com.raginggeek.games.roguelikepractice.entities.actors.ai.BatAI;
 import com.raginggeek.games.roguelikepractice.entities.actors.ai.FungusAI;
 import com.raginggeek.games.roguelikepractice.entities.actors.ai.PlayerAI;
+import com.raginggeek.games.roguelikepractice.entities.actors.ai.ZombieAI;
 import com.raginggeek.games.roguelikepractice.entities.actors.capabilities.FieldOfView;
 import com.raginggeek.games.roguelikepractice.world.World;
 
@@ -35,6 +36,13 @@ public class CreatureFactory {
         world.addAtEmptyLocation(bat, depth);
         new BatAI(bat);
         return bat;
+    }
+
+    public Creature newZombie(int depth, Creature player) {
+        Creature zombie = new Creature(world, 'z', AsciiPanel.white, 50, 10, 10);
+        world.addAtEmptyLocation(zombie, depth);
+        new ZombieAI(zombie, player);
+        return zombie;
     }
 
 }
