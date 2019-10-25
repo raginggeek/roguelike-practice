@@ -294,6 +294,14 @@ public class Creature implements Entity {
     }
 
     public Tile getTile(int wx, int wy, int wz) {
+        if (canSee(wx, wy, wz)) {
+            return getRealTile(wx, wy, wz);
+        } else {
+            return ai.getRememberedTile(wx, wy, wz);
+        }
+    }
+
+    public Tile getRealTile(int wx, int wy, int wz) {
         return world.getTile(wx, wy, wz);
     }
 
@@ -302,11 +310,24 @@ public class Creature implements Entity {
     }
 
     public Creature getWorldCreature(int wx, int wy, int wz) {
-        return world.getCreature(wx, wy, wz);
+        if (canSee(wx, wy, wz)) {
+            return world.getCreature(wx, wy, wz);
+        } else {
+            return null;
+        }
+
     }
 
     public Inventory getInventory() {
         return inventory;
+    }
+
+    public Item getItem(int wx, int wy, int wz) {
+        if (canSee(wx, wy, wz)) {
+            return world.getItem(wx, wy, wz);
+        } else {
+            return null;
+        }
     }
 
     public void pickup() {
@@ -377,5 +398,9 @@ public class Creature implements Entity {
                 armor = item;
             }
         }
+    }
+
+    public String getDetails() {
+        return String.format("     level:%d     attack:%d     defense:%d     hp:%d", getLevel(), getAttackValue(), getDefenseValue(), getHp());
     }
 }

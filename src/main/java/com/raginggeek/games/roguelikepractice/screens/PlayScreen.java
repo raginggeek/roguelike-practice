@@ -93,6 +93,12 @@ public class PlayScreen implements Screen {
                 case KeyEvent.VK_W:
                     subscreen = new EquipScreen(player);
                     break;
+                case KeyEvent.VK_X:
+                    subscreen = new ExamineScreen(player);
+                    break;
+                case KeyEvent.VK_SEMICOLON:
+                    subscreen = new LookScreen(player, "looking", player.getX() - getScrollX(), player.getY() - getScrollY());
+                    break;
             }
             switch (key.getKeyChar()) {
                 case '<':
@@ -108,6 +114,9 @@ public class PlayScreen implements Screen {
                 case 'g':
                 case ',':
                     player.pickup();
+                    break;
+                case '?':
+                    subscreen = new HelpScreen();
                     break;
             }
         }

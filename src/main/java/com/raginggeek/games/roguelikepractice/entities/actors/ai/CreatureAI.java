@@ -38,7 +38,7 @@ public abstract class CreatureAI {
         }
 
         for (Point p : new Line(creature.getX(), creature.getY(), wx, wy)) {
-            if (creature.getTile(p.getX(), p.getY(), wz).isGround() || p.getX() == wx && p.getY() == wy) {
+            if (creature.getRealTile(p.getX(), p.getY(), wz).isGround() || p.getX() == wx && p.getY() == wy) {
                 continue;
             }
             return false;
@@ -75,7 +75,12 @@ public abstract class CreatureAI {
         }
     }
 
+    public Tile getRememberedTile(int wx, int wy, int wz) {
+        return Tile.UNKNOWN;
+    }
+
     public abstract void onUpdate();
 
     public abstract void onNotify(String message);
+
 }
