@@ -65,6 +65,8 @@ public class ItemFactory {
                 return newDagger(depth);
             case 1:
                 return newSword(depth);
+            case 2:
+                return newBow(depth);
             default:
                 return newStaff(depth);
         }
@@ -79,6 +81,14 @@ public class ItemFactory {
             default:
                 return newHeavyArmor(depth);
         }
+    }
+
+    public Item newBow(int depth) {
+        Item item = new Item(')', AsciiPanel.yellow, "bow");
+        item.modifyAttackValue(1);
+        item.modifyRangedAttackValue(5);
+        world.addAtEmptyLocation(item, depth);
+        return item;
     }
 
     public Item newMcGuffin(int depth) {

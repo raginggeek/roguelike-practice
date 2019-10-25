@@ -4,6 +4,8 @@ import com.raginggeek.games.roguelikepractice.entities.Entity;
 import com.raginggeek.games.roguelikepractice.entities.actors.ai.CreatureAI;
 import com.raginggeek.games.roguelikepractice.entities.actors.capabilities.Inventory;
 import com.raginggeek.games.roguelikepractice.entities.items.Item;
+import com.raginggeek.games.roguelikepractice.world.Line;
+import com.raginggeek.games.roguelikepractice.world.Point;
 import com.raginggeek.games.roguelikepractice.world.Tile;
 import com.raginggeek.games.roguelikepractice.world.World;
 
@@ -184,19 +186,7 @@ public class Creature implements Entity {
         if (opponent == null) {
             ai.onEnter(x + mx, y + my, z + mz, tile);
         } else {
-            attack(opponent);
-        }
-    }
-
-    public void attack(Creature opponent) {
-        int damage = Math.max(0, attackValue - opponent.getDefenseValue());
-        damage = (int) (Math.random() * damage) + 1;
-
-        doEvent("attack the %s for %d damage", opponent.getName(), damage);
-        opponent.notify("The %s attacks you for %d damage.", opponent.getName(), damage);
-        opponent.modifyHp(-damage);
-        if (opponent.getHp() < 1) {
-            gainXp(opponent);
+            meleeAttack(opponent);
         }
     }
 
@@ -310,7 +300,7 @@ public class Creature implements Entity {
     }
 
     public Creature getWorldCreature(int wx, int wy, int wz) {
-        if (canSee(wx, wy, wz)) {
+        if (wx >= 0 && wy >= 0 && wz >= 0 && canSee(wx, wy, wz)) {
             return world.getCreature(wx, wy, wz);
         } else {
             return null;
@@ -403,4 +393,78 @@ public class Creature implements Entity {
     public String getDetails() {
         return String.format("     level:%d     attack:%d     defense:%d     hp:%d", getLevel(), getAttackValue(), getDefenseValue(), getHp());
     }
+
+    public void throwItem(Item item, int wx, int wy, int wz) {
+        Point end = new Point(x, y, 0);
+
+        for (Point p : new Line(x, y, wx, wy)) {
+            if (!getRealTile(p.getX(), p.getY(), z).isGround()) {
+                break;
+            }
+            end = p;
+        }
+
+        wx = end.getX();
+        wy = end.getY();
+
+        Creature c = getWorldCreature(wx, wy, wz);
+        if (c != null) {
+            throwAttack(item, c);
+        } else {
+            doEvent("throw a %s", item.getName());
+        }
+
+        putItemAt(item, wx, wy, wz);
+    }
+
+    public void meleeAttack(Creature opponent) {
+        attack(opponent, 3,
+                getAttackValue(),
+                "attack the %s for %d damage",
+                opponent.getName());
+    }
+
+    private void throwAttack(Item item, Creature opponent) {
+        attack(opponent, 2,
+                attackValue / 2 + item.getThrownAttackValue(),
+                "throw a %s at the %s for %d damage",
+                item.getName(),
+                opponent.getName());
+    }
+
+    public void rangedWeaponAttack(Creature opponent) {
+        attack(opponent, 2,
+                attackValue / 2 + weapon.getRangedAttackValue(),
+                "fire a %s at the %s for %d damage",
+                weapon.getName(),
+                opponent.getName());
+    }
+
+    private void attack(Creature opponent, int foodConsumption, int attack, String action, Object... params) {
+        modifyFood(-foodConsumption);
+        int amount = Math.max(0, attack - opponent.getDefenseValue());
+        amount = (int) (Math.random() * amount) + 1;
+
+        Object[] params2 = new Object[params.length + 1];
+        System.arraycopy(params, 0, params2, 0, params.length);
+        params2[params2.length - 1] = amount;
+        doEvent(action, params2);
+        opponent.modifyHp(-amount);
+
+        if (opponent.getHp() < 1) {
+            gainXp(opponent);
+        }
+    }
+
+
+    private void getRidOfItem(Item item) {
+        inventory.remove(item);
+        unEquip(item);
+    }
+
+    private void putItemAt(Item item, int wx, int wy, int wz) {
+        getRidOfItem(item);
+        world.addAtEmptySpace(item, wx, wy, wz);
+    }
+
 }

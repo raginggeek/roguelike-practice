@@ -99,6 +99,16 @@ public class PlayScreen implements Screen {
                 case KeyEvent.VK_SEMICOLON:
                     subscreen = new LookScreen(player, "looking", player.getX() - getScrollX(), player.getY() - getScrollY());
                     break;
+                case KeyEvent.VK_T:
+                    subscreen = new ThrowScreen(player, player.getX() - getScrollX(), player.getY() - getScrollY());
+                    break;
+                case KeyEvent.VK_F:
+                    if (player.getWeapon() == null || player.getWeapon().getRangedAttackValue() == 0) {
+                        player.notify("You don't have a ranged weapon equipped.");
+                    } else {
+                        subscreen = new FireWeaponScreen(player, player.getX() - getScrollX(), player.getY() - getScrollY());
+                    }
+                    break;
             }
             switch (key.getKeyChar()) {
                 case '<':
