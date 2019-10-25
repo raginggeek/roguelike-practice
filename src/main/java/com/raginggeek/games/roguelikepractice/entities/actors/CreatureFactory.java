@@ -1,20 +1,20 @@
 package com.raginggeek.games.roguelikepractice.entities.actors;
 
 import asciiPanel.AsciiPanel;
-import com.raginggeek.games.roguelikepractice.entities.actors.ai.BatAI;
-import com.raginggeek.games.roguelikepractice.entities.actors.ai.FungusAI;
-import com.raginggeek.games.roguelikepractice.entities.actors.ai.PlayerAI;
-import com.raginggeek.games.roguelikepractice.entities.actors.ai.ZombieAI;
+import com.raginggeek.games.roguelikepractice.entities.actors.ai.*;
 import com.raginggeek.games.roguelikepractice.entities.actors.capabilities.FieldOfView;
+import com.raginggeek.games.roguelikepractice.entities.items.ItemFactory;
 import com.raginggeek.games.roguelikepractice.world.World;
 
 import java.util.List;
 
 public class CreatureFactory {
     private World world;
+    private ItemFactory equipmentFactory;
 
     public CreatureFactory(World world) {
         this.world = world;
+        this.equipmentFactory = new ItemFactory(world);
     }
 
     public Creature newPlayer(List<String> messages, FieldOfView fov) {
@@ -43,6 +43,16 @@ public class CreatureFactory {
         world.addAtEmptyLocation(zombie, depth);
         new ZombieAI(zombie, player);
         return zombie;
+    }
+
+    public Creature newGoblin(int depth, Creature player) {
+        Creature goblin = new Creature(world, 'g', AsciiPanel.brightGreen, 66, 15, 5);
+        new GoblinAI(goblin, player);
+        goblin.equip(equipmentFactory.randomWeapon(depth));
+        goblin.equip(equipmentFactory.randomArmor(depth));
+        world.addAtEmptyLocation(goblin, depth);
+
+        return goblin;
     }
 
 }

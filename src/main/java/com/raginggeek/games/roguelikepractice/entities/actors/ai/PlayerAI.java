@@ -35,7 +35,6 @@ public class PlayerAI extends CreatureAI {
     }
 
     public void onUpdate() {
-
     }
 
     public boolean canSee(int wx, int wy, int wz) {

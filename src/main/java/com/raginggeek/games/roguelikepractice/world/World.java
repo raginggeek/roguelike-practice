@@ -169,4 +169,17 @@ public class World {
         }
         return false;
     }
+
+    public void removeItem(Item item) {
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                for (int z = 0; z < depth; z++) {
+                    if (items[x][y][z] == item) {
+                        items[x][y][z] = null;
+                        return;
+                    }
+                }
+            }
+        }
+    }
 }

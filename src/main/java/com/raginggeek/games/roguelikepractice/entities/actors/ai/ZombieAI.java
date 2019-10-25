@@ -1,12 +1,8 @@
 package com.raginggeek.games.roguelikepractice.entities.actors.ai;
 
 import com.raginggeek.games.roguelikepractice.entities.actors.Creature;
-import com.raginggeek.games.roguelikepractice.world.Path;
-import com.raginggeek.games.roguelikepractice.world.Point;
 
-import java.util.List;
-
-public class ZombieAI extends CreatureAI {
+public class ZombieAI extends AggressiveCreatureAI {
     private Creature player;
 
     public ZombieAI(Creature creature, Creature player) {
@@ -27,15 +23,4 @@ public class ZombieAI extends CreatureAI {
     @Override
     public void onNotify(String message) {
     }
-
-    public void hunt(Creature target) {
-        List<Point> points = new Path(creature, target.getX(), target.getY()).getPoints();
-
-        int mx = points.get(0).getX() - creature.getX();
-        int my = points.get(0).getY() - creature.getY();
-
-        creature.moveBy(mx, my, 0);
-    }
-
-
 }

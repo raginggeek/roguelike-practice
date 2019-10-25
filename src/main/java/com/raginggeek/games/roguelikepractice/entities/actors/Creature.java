@@ -33,6 +33,8 @@ public class Creature implements Entity {
     private Item armor;
     private int xp;
     private int level;
+    private int regenHpCooldown;
+    private int regenHpPer1000;
 
 
     public Creature(World world, char glyph, Color color, int maxHp, int attack, int defense) {
@@ -239,6 +241,7 @@ public class Creature implements Entity {
 
     public void update() {
         modifyFood(-1);
+        regenerateHealth();
         ai.onUpdate();
     }
 
@@ -346,6 +349,11 @@ public class Creature implements Entity {
         Item corpse = new Item('%', color, name + " corpse");
         corpse.modifyFoodValue(maxHp * 3);
         world.addAtEmptySpace(corpse, x, y, z);
+        for (Item item : inventory.getItems()) {
+            if (item != null) {
+                drop(item);
+            }
+        }
     }
 
     public void eat(Item item) {
@@ -377,6 +385,14 @@ public class Creature implements Entity {
     }
 
     public void equip(Item item) {
+        if (!inventory.contains(item)) {
+            if (inventory.isFull()) {
+                notify("Can't equip %s since you're holding too much stuff", item.getName());
+            } else {
+                world.removeItem(item);
+                inventory.add(item);
+            }
+        }
         if (item.getAttackValue() != 0 || item.getDefenseValue() != 0) {
             if (item.getAttackValue() >= item.getDefenseValue()) {
                 unEquip(weapon);
@@ -465,6 +481,19 @@ public class Creature implements Entity {
     private void putItemAt(Item item, int wx, int wy, int wz) {
         getRidOfItem(item);
         world.addAtEmptySpace(item, wx, wy, wz);
+    }
+
+    public void modifyRegenHpPer1000(int amount) {
+        regenHpPer1000 += amount;
+    }
+
+    private void regenerateHealth() {
+        regenHpCooldown -= regenHpPer1000;
+        if (regenHpCooldown < 0) {
+            modifyHp(1);
+            modifyFood(-1);
+            regenHpCooldown += 1000;
+        }
     }
 
 }
