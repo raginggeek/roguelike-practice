@@ -109,6 +109,9 @@ public class PlayScreen implements Screen {
                         subscreen = new FireWeaponScreen(player, player.getX() - getScrollX(), player.getY() - getScrollY());
                     }
                     break;
+                case KeyEvent.VK_Q:
+                    subscreen = new QuaffScreen(player);
+                    break;
             }
             switch (key.getKeyChar()) {
                 case '<':
@@ -210,6 +213,9 @@ public class PlayScreen implements Screen {
             }
             for (int i = 0; i < world.getWidth() * world.getHeight() / 640; i++) {
                 itemFactory.randomArmor(z);
+            }
+            for (int i = 0; i < 3; i++) {
+                itemFactory.randomPotion(z);
             }
         }
 

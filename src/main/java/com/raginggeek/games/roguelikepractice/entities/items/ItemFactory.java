@@ -1,6 +1,8 @@
 package com.raginggeek.games.roguelikepractice.entities.items;
 
 import asciiPanel.AsciiPanel;
+import com.raginggeek.games.roguelikepractice.entities.actors.Creature;
+import com.raginggeek.games.roguelikepractice.entities.effects.Effect;
 import com.raginggeek.games.roguelikepractice.world.World;
 
 public class ItemFactory {
@@ -83,6 +85,17 @@ public class ItemFactory {
         }
     }
 
+    public Item randomPotion(int depth) {
+        switch ((int) (Math.random() * 3)) {
+            case 0:
+                return newPotionOfHealth(depth);
+            case 1:
+                return newPotionOfPoison(depth);
+            default:
+                return newPotionofWarrior(depth);
+        }
+    }
+
     public Item newBow(int depth) {
         Item item = new Item(')', AsciiPanel.yellow, "bow");
         item.modifyAttackValue(1);
@@ -93,6 +106,68 @@ public class ItemFactory {
 
     public Item newMcGuffin(int depth) {
         Item item = new Item('*', AsciiPanel.brightWhite, "Holy Relic");
+        world.addAtEmptyLocation(item, depth);
+        return item;
+    }
+
+    public Item newPotionOfHealth(int depth) {
+        Item item = new Item('!', AsciiPanel.white, "health potion");
+        item.setQuaffEffect(new Effect(1) {
+            public void start(Creature creature) {
+                if (creature.getHp() == creature.getMaxHp()) {
+                    return;
+                }
+                creature.modifyHp(15);
+                creature.doEvent("look healthier");
+            }
+
+            public void end(Creature creature) {
+            }
+        });
+        world.addAtEmptyLocation(item, depth);
+        return item;
+    }
+
+    public Item newPotionOfPoison(int depth) {
+        Item item = new Item('!', AsciiPanel.white, "poison potion");
+        item.setQuaffEffect(new Effect(20) {
+            @Override
+            public void start(Creature creature) {
+                creature.doEvent("look sick");
+            }
+
+            @Override
+            public void update(Creature creature) {
+                super.update(creature);
+                creature.modifyHp(-1);
+            }
+
+            @Override
+            public void end(Creature creature) {
+
+            }
+        });
+        world.addAtEmptyLocation(item, depth);
+        return item;
+    }
+
+    public Item newPotionofWarrior(int depth) {
+        Item item = new Item('!', AsciiPanel.white, "warrior's potion");
+        item.setQuaffEffect(new Effect(20) {
+            @Override
+            public void start(Creature creature) {
+                creature.modifyAttackValue(5);
+                creature.modifyDefenseValue(5);
+                creature.doEvent("look stronger");
+            }
+
+            @Override
+            public void end(Creature creature) {
+                creature.modifyAttackValue(-5);
+                creature.modifyDefenseValue(-5);
+                creature.doEvent("look less strong");
+            }
+        });
         world.addAtEmptyLocation(item, depth);
         return item;
     }

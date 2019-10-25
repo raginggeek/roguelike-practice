@@ -3,6 +3,7 @@ package com.raginggeek.games.roguelikepractice.entities.actors;
 import com.raginggeek.games.roguelikepractice.entities.Entity;
 import com.raginggeek.games.roguelikepractice.entities.actors.ai.CreatureAI;
 import com.raginggeek.games.roguelikepractice.entities.actors.capabilities.Inventory;
+import com.raginggeek.games.roguelikepractice.entities.effects.Effect;
 import com.raginggeek.games.roguelikepractice.entities.items.Item;
 import com.raginggeek.games.roguelikepractice.world.Line;
 import com.raginggeek.games.roguelikepractice.world.Point;
@@ -10,9 +11,13 @@ import com.raginggeek.games.roguelikepractice.world.Tile;
 import com.raginggeek.games.roguelikepractice.world.World;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Creature implements Entity {
     private World world;
+    private CreatureAI ai;
+    private List<Effect> effects;
 
     private int x;
     private int y;
@@ -20,7 +25,7 @@ public class Creature implements Entity {
     private char glyph;
     private String name;
     private Color color;
-    private CreatureAI ai;
+
     private int maxHp;
     private int hp;
     private int attackValue;
@@ -49,6 +54,7 @@ public class Creature implements Entity {
         this.inventory = new Inventory(20);
         this.maxFood = 1000;
         this.food = maxFood / 3 * 2;
+        this.effects = new ArrayList<>();
     }
 
     public int getXp() {
@@ -214,22 +220,34 @@ public class Creature implements Entity {
         }
     }
 
+    /**
+     * level up hp effect
+     */
     public void gainMaxHp() {
         maxHp += 10;
         hp += 10;
         doEvent("look healthier");
     }
 
+    /**
+     * level up attack value effect
+     */
     public void gainAttackValue() {
-        attackValue += 2;
+        modifyAttackValue(2);
         doEvent("look stronger");
     }
 
+    /**
+     * level up defense value effect
+     */
     public void gainDefenseValue() {
-        defenseValue += 2;
+        modifyDefenseValue(2);
         doEvent("look tougher");
     }
 
+    /**
+     * level up vision effect
+     */
     public void gainVision() {
         visionRadius += 1;
         doEvent("look more aware");
@@ -242,6 +260,7 @@ public class Creature implements Entity {
     public void update() {
         modifyFood(-1);
         regenerateHealth();
+        updateEffects();
         ai.onUpdate();
     }
 
@@ -356,15 +375,6 @@ public class Creature implements Entity {
         }
     }
 
-    public void eat(Item item) {
-        if (item.getFoodValue() < 0) {
-            notify("Gross!");
-        }
-        modifyFood(item.getFoodValue());
-        inventory.remove(item);
-        unEquip(item);
-    }
-
     public Item getWeapon() {
         return weapon;
     }
@@ -430,7 +440,12 @@ public class Creature implements Entity {
             doEvent("throw a %s", item.getName());
         }
 
-        putItemAt(item, wx, wy, wz);
+        if (item.getQuaffEffect() != null && c != null) {
+            getRidOfItem(item);
+        } else {
+            putItemAt(item, wx, wy, wz);
+        }
+
     }
 
     public void meleeAttack(Creature opponent) {
@@ -446,6 +461,7 @@ public class Creature implements Entity {
                 "throw a %s at the %s for %d damage",
                 item.getName(),
                 opponent.getName());
+        opponent.addEffect(item.getQuaffEffect());
     }
 
     public void rangedWeaponAttack(Creature opponent) {
@@ -494,6 +510,58 @@ public class Creature implements Entity {
             modifyFood(-1);
             regenHpCooldown += 1000;
         }
+    }
+
+    public void modifyAttackValue(int amount) {
+        attackValue += amount;
+    }
+
+    public void modifyDefenseValue(int amount) {
+        defenseValue += amount;
+    }
+
+    public List<Effect> getEffects() {
+        return effects;
+    }
+
+    public void quaff(Item item) {
+        doEvent("quaff a " + item.getName());
+        consume(item);
+    }
+
+    public void eat(Item item) {
+        doEvent("eat a " + item.getName());
+        consume(item);
+    }
+
+    public void consume(Item item) {
+        if (item.getFoodValue() < 0) {
+            notify("Gross!");
+        }
+        addEffect(item.getQuaffEffect());
+        modifyFood(item.getFoodValue());
+        getRidOfItem(item);
+    }
+
+    private void addEffect(Effect effect) {
+        if (effect == null) {
+            return;
+        }
+
+        effect.start(this);
+        effects.add(effect);
+    }
+
+    private void updateEffects() {
+        List<Effect> done = new ArrayList<>();
+        for (Effect effect : effects) {
+            effect.update(this);
+            if (effect.isDone()) {
+                effect.end(this);
+                done.add(effect);
+            }
+        }
+        effects.removeAll(done);
     }
 
 }

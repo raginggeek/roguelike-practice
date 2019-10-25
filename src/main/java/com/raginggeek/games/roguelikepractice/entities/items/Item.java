@@ -1,10 +1,12 @@
 package com.raginggeek.games.roguelikepractice.entities.items;
 
 import com.raginggeek.games.roguelikepractice.entities.Entity;
+import com.raginggeek.games.roguelikepractice.entities.effects.Effect;
 
 import java.awt.*;
 
 public class Item implements Entity {
+    private Effect quaffEffect;
     private char glyph;
     private Color color;
     private String name;
@@ -88,5 +90,13 @@ public class Item implements Entity {
 
     public void modifyRangedAttackValue(int amount) {
         rangedAttackValue += amount;
+    }
+
+    public Effect getQuaffEffect() {
+        return quaffEffect;
+    }
+
+    public void setQuaffEffect(Effect effect) {
+        quaffEffect = effect;
     }
 }
