@@ -30,6 +30,10 @@ public class PlayerAI extends CreatureAI {
         messages.add(message);
     }
 
+    public void onGainLevel() {
+
+    }
+
     public void onUpdate() {
 
     }

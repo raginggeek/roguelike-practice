@@ -29,6 +29,9 @@ public class Creature implements Entity {
     private int food;
     private Item weapon;
     private Item armor;
+    private int xp;
+    private int level;
+
 
     public Creature(World world, char glyph, Color color, int maxHp, int attack, int defense) {
         this.world = world;
@@ -42,6 +45,25 @@ public class Creature implements Entity {
         this.inventory = new Inventory(20);
         this.maxFood = 1000;
         this.food = maxFood / 3 * 2;
+    }
+
+    public int getXp() {
+        return xp;
+    }
+
+    public void modifyXp(int amount) {
+        xp += amount;
+        notify("You %s %d xp.", amount < 0 ? "lose" : "gain", amount);
+        while (xp > (int) (Math.pow(level, 1.5) * 20)) {
+            level++;
+            doEvent("advance to level %d", level);
+            ai.onGainLevel();
+            modifyHp(level * 2);
+        }
+    }
+
+    public int getLevel() {
+        return level;
     }
 
     public int getMaxFood() {
@@ -173,6 +195,9 @@ public class Creature implements Entity {
         doEvent("attack the %s for %d damage", opponent.getName(), damage);
         opponent.notify("The %s attacks you for %d damage.", opponent.getName(), damage);
         opponent.modifyHp(-damage);
+        if (opponent.getHp() < 1) {
+            gainXp(opponent);
+        }
     }
 
     public void modifyHp(int amount) {
@@ -185,6 +210,37 @@ public class Creature implements Entity {
             leaveCorpse();
             world.removeCreature(this);
         }
+    }
+
+    public void gainXp(Creature opponent) {
+        int amount = opponent.getMaxHp() +
+                opponent.getAttackValue() +
+                opponent.getDefenseValue()
+                - level * 2;
+        if (amount > 0) {
+            modifyXp(amount);
+        }
+    }
+
+    public void gainMaxHp() {
+        maxHp += 10;
+        hp += 10;
+        doEvent("look healthier");
+    }
+
+    public void gainAttackValue() {
+        attackValue += 2;
+        doEvent("look stronger");
+    }
+
+    public void gainDefenseValue() {
+        defenseValue += 2;
+        doEvent("look tougher");
+    }
+
+    public void gainVision() {
+        visionRadius += 1;
+        doEvent("look more aware");
     }
 
     public boolean canEnter(int x, int y, int z) {

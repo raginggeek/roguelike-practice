@@ -1,6 +1,7 @@
 package com.raginggeek.games.roguelikepractice.entities.actors.ai;
 
 import com.raginggeek.games.roguelikepractice.entities.actors.Creature;
+import com.raginggeek.games.roguelikepractice.service.LevelUpService;
 import com.raginggeek.games.roguelikepractice.world.Line;
 import com.raginggeek.games.roguelikepractice.world.Point;
 import com.raginggeek.games.roguelikepractice.world.Tile;
@@ -53,6 +54,10 @@ public abstract class CreatureAI {
         } else {
             creature.doEvent("bump into a wall");
         }
+    }
+
+    public void onGainLevel() {
+        new LevelUpService().autoLevelUp(creature);
     }
 
     public void wander() {
