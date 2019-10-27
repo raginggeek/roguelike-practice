@@ -2,11 +2,15 @@ package com.raginggeek.games.roguelikepractice.entities.items;
 
 import com.raginggeek.games.roguelikepractice.entities.Entity;
 import com.raginggeek.games.roguelikepractice.entities.effects.Effect;
+import com.raginggeek.games.roguelikepractice.entities.effects.Spell;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Item implements Entity {
     private Effect quaffEffect;
+    private List<Spell> writtenSpells;
     private char glyph;
     private Color color;
     private String name;
@@ -21,6 +25,7 @@ public class Item implements Entity {
         this.color = color;
         this.name = name;
         this.thrownAttackValue = 1;
+        writtenSpells = new ArrayList<>();
     }
 
     public char getGlyph() {
@@ -98,5 +103,13 @@ public class Item implements Entity {
 
     public void setQuaffEffect(Effect effect) {
         quaffEffect = effect;
+    }
+
+    public List<Spell> getWrittenSpells() {
+        return writtenSpells;
+    }
+
+    public void addWrittenSpell(String name, int manaCost, Effect effect) {
+        writtenSpells.add(new Spell(name, manaCost, effect));
     }
 }

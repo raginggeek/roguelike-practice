@@ -41,7 +41,7 @@ public class PlayScreen implements Screen {
         int top = getScrollY();
         displayTiles(terminal, left, top);
         displayCreatures(terminal, left, top);
-        String stats = String.format(" %3d/%3d hp %8s", player.getHp(), player.getMaxHp(), hunger());
+        String stats = String.format(" %3d/%3d hp  %d/%d mana  %8s", player.getHp(), player.getMaxHp(), player.getMana(), player.getMaxMana(), hunger());
         displayMessages(terminal, messages);
         terminal.write(stats, 1, 23);
         if (subscreen != null) {
@@ -111,6 +111,9 @@ public class PlayScreen implements Screen {
                     break;
                 case KeyEvent.VK_Q:
                     subscreen = new QuaffScreen(player);
+                    break;
+                case KeyEvent.VK_R:
+                    subscreen = new ReadScreen(player, player.getX() - getScrollX(), player.getY() - getScrollY());
                     break;
             }
             switch (key.getKeyChar()) {
@@ -216,6 +219,9 @@ public class PlayScreen implements Screen {
             }
             for (int i = 0; i < 3; i++) {
                 itemFactory.randomPotion(z);
+            }
+            for (int i = 0; i < 2; i++) {
+                itemFactory.randomSpellBook(z);
             }
         }
 

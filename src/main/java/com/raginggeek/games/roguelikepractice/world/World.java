@@ -182,4 +182,8 @@ public class World {
             }
         }
     }
+
+    public void add(Creature pet) {
+        creatures.add(pet);
+    }
 }

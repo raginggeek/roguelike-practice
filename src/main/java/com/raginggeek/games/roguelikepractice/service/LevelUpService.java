@@ -32,6 +32,18 @@ public class LevelUpService {
                 public void invoke(Creature creature) {
                     creature.gainVision();
                 }
+            },
+            new LevelUpOption("Increased mana") {
+                @Override
+                public void invoke(Creature creature) {
+                    creature.gainMaxMana();
+                }
+            },
+            new LevelUpOption("Increased mana regeneration") {
+                @Override
+                public void invoke(Creature creature) {
+                    creature.gainRegenMana();
+                }
             }
     };
 

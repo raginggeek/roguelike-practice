@@ -23,6 +23,7 @@ public class HelpScreen implements Screen {
         terminal.write("[t] to throw items", 2, y++);
         terminal.write("[f] to fire a ranged weapon", 2, y++);
         terminal.write("[q] quaff a potion", 2, y++);
+        terminal.write("[r] read something", 2, y++);
 
         terminal.writeCenter("-- press any key to continue --", 22);
     }

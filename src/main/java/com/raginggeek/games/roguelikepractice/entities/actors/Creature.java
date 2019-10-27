@@ -4,6 +4,7 @@ import com.raginggeek.games.roguelikepractice.entities.Entity;
 import com.raginggeek.games.roguelikepractice.entities.actors.ai.CreatureAI;
 import com.raginggeek.games.roguelikepractice.entities.actors.capabilities.Inventory;
 import com.raginggeek.games.roguelikepractice.entities.effects.Effect;
+import com.raginggeek.games.roguelikepractice.entities.effects.Spell;
 import com.raginggeek.games.roguelikepractice.entities.items.Item;
 import com.raginggeek.games.roguelikepractice.world.Line;
 import com.raginggeek.games.roguelikepractice.world.Point;
@@ -40,6 +41,12 @@ public class Creature implements Entity {
     private int level;
     private int regenHpCooldown;
     private int regenHpPer1000;
+    private int maxMana;
+    private int mana;
+    private int regenManaCooldown;
+    private int regenManaPer1000;
+    private int detectCreatures;
+
 
 
     public Creature(World world, char glyph, Color color, int maxHp, int attack, int defense) {
@@ -55,6 +62,9 @@ public class Creature implements Entity {
         this.maxFood = 1000;
         this.food = maxFood / 3 * 2;
         this.effects = new ArrayList<>();
+        this.regenManaPer1000 = 0;
+        this.detectCreatures = 0;
+
     }
 
     public int getXp() {
@@ -253,6 +263,17 @@ public class Creature implements Entity {
         doEvent("look more aware");
     }
 
+    public void gainMaxMana() {
+        maxMana += 5;
+        mana += 5;
+        doEvent("look more magical");
+    }
+
+    public void gainRegenMana() {
+        regenManaPer1000 += 5;
+        doEvent("look a little less tired");
+    }
+
     public boolean canEnter(int x, int y, int z) {
         return world.canEnter(x, y, z);
     }
@@ -260,6 +281,7 @@ public class Creature implements Entity {
     public void update() {
         modifyFood(-1);
         regenerateHealth();
+        regenerateMana();
         updateEffects();
         ai.onUpdate();
     }
@@ -302,7 +324,9 @@ public class Creature implements Entity {
     }
 
     public boolean canSee(int wx, int wy, int wz) {
-        return ai.canSee(wx, wy, wz);
+        return (detectCreatures > 0 &&
+                world.getCreature(wx, wy, wz) != null ||
+                ai.canSee(wx, wy, wz));
     }
 
     public Tile getTile(int wx, int wy, int wz) {
@@ -503,6 +527,14 @@ public class Creature implements Entity {
         regenHpPer1000 += amount;
     }
 
+    public void modifyRegenManaPer1000(int amount) {
+        regenManaPer1000 += amount;
+    }
+
+    public void modifyVisionRadius(int amount) {
+        visionRadius += amount;
+    }
+
     private void regenerateHealth() {
         regenHpCooldown -= regenHpPer1000;
         if (regenHpCooldown < 0) {
@@ -562,6 +594,56 @@ public class Creature implements Entity {
             }
         }
         effects.removeAll(done);
+    }
+
+    public int getMaxMana() {
+        return maxMana;
+    }
+
+    public int getMana() {
+        return mana;
+    }
+
+    public void modifyMana(int amount) {
+        mana = Math.max(0, Math.min(mana + amount, maxMana));
+    }
+
+    private void regenerateMana() {
+        regenManaCooldown -= regenManaPer1000;
+        if (regenManaCooldown < 0) {
+            if (mana < maxMana) {
+                modifyMana(1);
+                modifyFood(-1);
+            }
+            regenManaCooldown += 1000;
+        }
+    }
+
+    public void summon(Creature other) {
+        world.add(other);
+    }
+
+    public int getDetectCreatures() {
+        return detectCreatures;
+    }
+
+    public void modifyDetectCreatures(int amount) {
+        detectCreatures += amount;
+    }
+
+    public void castSpell(Spell spell, int x2, int y2) {
+        Creature opponent = getWorldCreature(x2, y2, z);
+
+        if (spell.getManaCost() > mana) {
+            doEvent("point and mumble but nothing happens");
+            return;
+        } else if (opponent == null) {
+            doEvent("point and mumble at nothing");
+            return;
+        }
+
+        opponent.addEffect(spell.getEffect());
+        modifyMana(-spell.getManaCost());
     }
 
 }
