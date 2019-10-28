@@ -6,36 +6,43 @@ import com.raginggeek.games.roguelikepractice.entities.actors.CreatureFactory;
 import com.raginggeek.games.roguelikepractice.entities.effects.Effect;
 import com.raginggeek.games.roguelikepractice.world.World;
 
+import java.awt.*;
+import java.util.List;
+import java.util.*;
+
 public class ItemFactory {
     private World world;
+    private Map<String, Color> potionColors;
+    private List<String> potionAppearances;
     private CreatureFactory creatureFactory;
 
     public ItemFactory(World world) {
         this.world = world;
+        setupPotionAppearances();
     }
 
     public Item newRock(int depth) {
-        Item rock = new Item(',', AsciiPanel.yellow, "rock");
+        Item rock = new Item(',', AsciiPanel.yellow, "rock", null);
         world.addAtEmptyLocation(rock, depth);
         return rock;
     }
 
     public Item newDagger(int depth) {
-        Item item = new Item(')', AsciiPanel.white, "dagger");
+        Item item = new Item(')', AsciiPanel.white, "dagger", null);
         item.modifyAttackValue(5);
         world.addAtEmptyLocation(item, depth);
         return item;
     }
 
     public Item newSword(int depth) {
-        Item item = new Item(')', AsciiPanel.brightWhite, "sword");
+        Item item = new Item(')', AsciiPanel.brightWhite, "sword", null);
         item.modifyAttackValue(10);
         world.addAtEmptyLocation(item, depth);
         return item;
     }
 
     public Item newStaff(int depth) {
-        Item item = new Item(')', AsciiPanel.yellow, "staff");
+        Item item = new Item(')', AsciiPanel.yellow, "staff", null);
         item.modifyAttackValue(5);
         item.modifyDefenseValue(3);
         world.addAtEmptyLocation(item, depth);
@@ -43,21 +50,21 @@ public class ItemFactory {
     }
 
     public Item newLightArmor(int depth) {
-        Item item = new Item('[', AsciiPanel.green, "tunic");
+        Item item = new Item('[', AsciiPanel.green, "tunic", null);
         item.modifyDefenseValue(2);
         world.addAtEmptyLocation(item, depth);
         return item;
     }
 
     public Item newMediumArmor(int depth) {
-        Item item = new Item('[', AsciiPanel.white, "chainmail");
+        Item item = new Item('[', AsciiPanel.white, "chainmail", null);
         item.modifyDefenseValue(4);
         world.addAtEmptyLocation(item, depth);
         return item;
     }
 
     public Item newHeavyArmor(int depth) {
-        Item item = new Item('[', AsciiPanel.brightWhite, "platemail");
+        Item item = new Item('[', AsciiPanel.brightWhite, "platemail", null);
         item.modifyDefenseValue(6);
         world.addAtEmptyLocation(item, depth);
         return item;
@@ -110,7 +117,7 @@ public class ItemFactory {
     }
 
     public Item newBow(int depth) {
-        Item item = new Item(')', AsciiPanel.yellow, "bow");
+        Item item = new Item(')', AsciiPanel.yellow, "bow", null);
         item.modifyAttackValue(1);
         item.modifyRangedAttackValue(5);
         world.addAtEmptyLocation(item, depth);
@@ -118,20 +125,22 @@ public class ItemFactory {
     }
 
     public Item newMcGuffin(int depth) {
-        Item item = new Item('*', AsciiPanel.brightWhite, "Holy Relic");
+        Item item = new Item('*', AsciiPanel.brightWhite, "Holy Relic", null);
         world.addAtEmptyLocation(item, depth);
         return item;
     }
 
     public Item newPotionOfHealth(int depth) {
-        Item item = new Item('!', AsciiPanel.white, "health potion");
+        String appearance = potionAppearances.get(0);
+        Item item = new Item('!', potionColors.get(appearance), "health potion", appearance);
         item.setQuaffEffect(new Effect(1) {
             public void start(Creature creature) {
                 if (creature.getHp() == creature.getMaxHp()) {
                     return;
                 }
-                creature.modifyHp(15);
+                creature.modifyHp(15, null);
                 creature.doEvent("look healthier");
+                creature.learnName(item);
             }
 
             public void end(Creature creature) {
@@ -142,17 +151,19 @@ public class ItemFactory {
     }
 
     public Item newPotionOfPoison(int depth) {
-        Item item = new Item('!', AsciiPanel.white, "poison potion");
+        String appearance = potionAppearances.get(1);
+        Item item = new Item('!', potionColors.get(appearance), "poison potion", appearance);
         item.setQuaffEffect(new Effect(20) {
             @Override
             public void start(Creature creature) {
                 creature.doEvent("look sick");
+                creature.learnName(item);
             }
 
             @Override
             public void update(Creature creature) {
                 super.update(creature);
-                creature.modifyHp(-1);
+                creature.modifyHp(-1, "Killed by poisoning.");
             }
 
             @Override
@@ -165,13 +176,15 @@ public class ItemFactory {
     }
 
     public Item newPotionofWarrior(int depth) {
-        Item item = new Item('!', AsciiPanel.white, "warrior's potion");
+        String appearance = potionAppearances.get(2);
+        Item item = new Item('!', potionColors.get(appearance), "warrior's potion", appearance);
         item.setQuaffEffect(new Effect(20) {
             @Override
             public void start(Creature creature) {
                 creature.modifyAttackValue(5);
                 creature.modifyDefenseValue(5);
                 creature.doEvent("look stronger");
+                creature.learnName(item);
             }
 
             @Override
@@ -186,7 +199,8 @@ public class ItemFactory {
     }
 
     public Item newPotionOfMana(int depth) {
-        Item item = new Item('!', AsciiPanel.white, "mana potion");
+        String appearance = potionAppearances.get(3);
+        Item item = new Item('!', potionColors.get(appearance), "mana potion", appearance);
         item.setQuaffEffect(new Effect(1) {
             public void start(Creature creature) {
                 if (creature.getMana() == creature.getMaxMana()) {
@@ -194,6 +208,7 @@ public class ItemFactory {
                 }
                 creature.modifyMana(15);
                 creature.doEvent("look more concentrated");
+                creature.learnName(item);
             }
 
             public void end(Creature creature) {
@@ -204,7 +219,7 @@ public class ItemFactory {
     }
 
     public Item newWhiteMagesSpellbook(int depth) {
-        Item item = new Item('+', AsciiPanel.brightWhite, "white mage's spellbook");
+        Item item = new Item('+', AsciiPanel.brightWhite, "white mage's spellbook", null);
         item.addWrittenSpell("minor heal", 4, new Effect(1) {
             @Override
             public void start(Creature creature) {
@@ -212,7 +227,7 @@ public class ItemFactory {
                     return;
                 }
 
-                creature.modifyHp(20);
+                creature.modifyHp(20, null);
                 creature.doEvent("look healthier");
             }
 
@@ -227,7 +242,7 @@ public class ItemFactory {
                     return;
                 }
 
-                creature.modifyHp(50);
+                creature.modifyHp(50, null);
                 creature.doEvent("look healthier");
             }
 
@@ -250,7 +265,7 @@ public class ItemFactory {
             @Override
             public void update(Creature creature) {
                 super.update(creature);
-                creature.modifyHp(2);
+                creature.modifyHp(2, null);
             }
         });
         item.addWrittenSpell("inner strength", 16, new Effect(50) {
@@ -267,7 +282,7 @@ public class ItemFactory {
             public void update(Creature creature) {
                 super.update(creature);
                 if (Math.random() < 0.25) {
-                    creature.modifyHp(1);
+                    creature.modifyHp(1, null);
                 }
             }
 
@@ -286,11 +301,11 @@ public class ItemFactory {
     }
 
     public Item newBlueMagesSpellbook(int depth) {
-        Item item = new Item('+', AsciiPanel.brightBlue, "blue mage's spellbook");
+        Item item = new Item('+', AsciiPanel.brightBlue, "blue mage's spellbook", null);
         item.addWrittenSpell("blood to mana", 1, new Effect(1) {
             public void start(Creature creature) {
                 int amount = Math.min(creature.getHp() - 1, creature.getMaxMana() - creature.getMana());
-                creature.modifyHp(-amount);
+                creature.modifyHp(-amount, "Killed by blood magic.");
                 creature.modifyMana(amount);
             }
 
@@ -369,6 +384,21 @@ public class ItemFactory {
         });
         world.addAtEmptyLocation(item, depth);
         return item;
+    }
+
+    private void setupPotionAppearances() {
+        potionColors = new HashMap<>();
+        potionColors.put("red potion", AsciiPanel.brightRed);
+        potionColors.put("yellow potion", AsciiPanel.brightYellow);
+        potionColors.put("green potion", AsciiPanel.brightGreen);
+        potionColors.put("cyan potion", AsciiPanel.brightCyan);
+        potionColors.put("blue potion", AsciiPanel.brightBlue);
+        potionColors.put("magenta potion", AsciiPanel.brightMagenta);
+        potionColors.put("dark potion", AsciiPanel.brightBlack);
+        potionColors.put("grey potion", AsciiPanel.white);
+        potionColors.put("light potion", AsciiPanel.brightWhite);
+        potionAppearances = new ArrayList<>(potionColors.keySet());
+        Collections.shuffle(potionAppearances);
     }
 
 

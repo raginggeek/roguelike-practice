@@ -52,7 +52,7 @@ public abstract class InventoryScreen implements Screen {
                 continue;
             }
 
-            String line = letters.charAt(i) + " - " + item.getGlyph() + " " + item.getName();
+            String line = letters.charAt(i) + " - " + item.getGlyph() + " " + player.nameOf(item);
 
             if (item == player.getWeapon() || item == player.getArmor()) {
                 line += " (equipped)";

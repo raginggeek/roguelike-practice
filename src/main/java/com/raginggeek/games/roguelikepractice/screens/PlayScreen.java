@@ -141,7 +141,7 @@ public class PlayScreen implements Screen {
             world.update();
         }
         if (player.getHp() < 1) {
-            return new LoseScreen();
+            return new LoseScreen(player);
         }
         if (player.getLevel() > level) {
             subscreen = new LevelUpScreen(player, player.getLevel() - level);
@@ -247,7 +247,7 @@ public class PlayScreen implements Screen {
                 return new WinScreen();
             }
         }
-        return new LoseScreen();
+        return new LoseScreen(player);
     }
 
     private String hunger() {

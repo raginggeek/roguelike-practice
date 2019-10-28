@@ -21,7 +21,7 @@ public class LookScreen extends TargettingScreen {
 
         Item item = player.getItem(x, y, player.getZ());
         if (item != null) {
-            caption = item.getGlyph() + " " + item.getName() + item.getDetails();
+            caption = item.getGlyph() + " " + player.nameOf(item) + item.getDetails();
             return;
         }
 

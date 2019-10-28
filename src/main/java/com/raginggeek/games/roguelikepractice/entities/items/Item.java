@@ -19,11 +19,13 @@ public class Item implements Entity {
     private int defenseValue;
     private int thrownAttackValue;
     private int rangedAttackValue;
+    private String appearance;
 
-    public Item(char glyph, Color color, String name) {
+    public Item(char glyph, Color color, String name, String appearance) {
         this.glyph = glyph;
         this.color = color;
         this.name = name;
+        this.appearance = appearance;
         this.thrownAttackValue = 1;
         writtenSpells = new ArrayList<>();
     }
@@ -111,5 +113,13 @@ public class Item implements Entity {
 
     public void addWrittenSpell(String name, int manaCost, Effect effect) {
         writtenSpells.add(new Spell(name, manaCost, effect));
+    }
+
+    public String getAppearance() {
+        if (appearance == null) {
+            return name;
+        } else {
+            return appearance;
+        }
     }
 }

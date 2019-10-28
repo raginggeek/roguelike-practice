@@ -9,7 +9,7 @@ public class TargetThrowScreen extends TargettingScreen {
     private Item item;
 
     public TargetThrowScreen(Creature player, int sx, int sy, Item item) {
-        super(player, "Throw " + item.getName() + " at?", sx, sy);
+        super(player, "Throw " + player.nameOf(item) + " at?", sx, sy);
         this.item = item;
     }
 

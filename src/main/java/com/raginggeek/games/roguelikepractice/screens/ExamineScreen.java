@@ -21,8 +21,8 @@ public class ExamineScreen extends InventoryScreen {
 
     @Override
     protected Screen use(Item item) {
-        String article = "aeiou".contains(item.getName().subSequence(0, 1)) ? "an " : "a ";
-        player.notify("It's " + article + item.getName() + ". " + item.getDetails());
+        String article = "aeiou".contains(player.nameOf(item).subSequence(0, 1)) ? "an " : "a ";
+        player.notify("It's " + article + player.nameOf(item) + ". " + item.getDetails());
         return null;
     }
 }

@@ -1,25 +1,32 @@
 package com.raginggeek.games.roguelikepractice.entities.actors.ai;
 
 import com.raginggeek.games.roguelikepractice.entities.actors.Creature;
+import com.raginggeek.games.roguelikepractice.entities.items.Item;
 import com.raginggeek.games.roguelikepractice.service.LevelUpService;
 import com.raginggeek.games.roguelikepractice.world.Line;
 import com.raginggeek.games.roguelikepractice.world.Point;
 import com.raginggeek.games.roguelikepractice.world.Tile;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public abstract class CreatureAI {
     protected String name;
     protected Creature creature;
+    private Map<String, String> itemNames;
 
     public CreatureAI(Creature creature) {
         this.name = "creature";
         this.creature = creature;
         this.creature.setCreatureAi(this);
+        this.itemNames = new HashMap<>();
     }
 
     public CreatureAI(Creature creature, String name) {
         this.name = name;
         this.creature = creature;
         this.creature.setCreatureAi(this);
+        this.itemNames = new HashMap<>();
     }
 
     public String getName() {
@@ -82,5 +89,14 @@ public abstract class CreatureAI {
     public abstract void onUpdate();
 
     public abstract void onNotify(String message);
+
+    public String getName(Item item) {
+        String name = itemNames.get(item.getName());
+        return name == null ? item.getAppearance() : name;
+    }
+
+    public void setName(Item item, String name) {
+        itemNames.put(item.getName(), name);
+    }
 
 }

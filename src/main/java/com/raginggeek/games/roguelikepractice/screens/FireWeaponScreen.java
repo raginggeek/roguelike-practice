@@ -7,7 +7,7 @@ import com.raginggeek.games.roguelikepractice.world.Point;
 public class FireWeaponScreen extends TargettingScreen {
 
     public FireWeaponScreen(Creature player, int sx, int sy) {
-        super(player, "Fire " + player.getWeapon().getName() + " at?", sx, sy);
+        super(player, "Fire " + player.nameOf(player.getWeapon()) + " at?", sx, sy);
     }
 
     public boolean isAcceptable(int x, int y) {

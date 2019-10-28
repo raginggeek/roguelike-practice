@@ -46,6 +46,7 @@ public class Creature implements Entity {
     private int regenManaCooldown;
     private int regenManaPer1000;
     private int detectCreatures;
+    private String causeOfDeath;
 
 
 
@@ -78,7 +79,7 @@ public class Creature implements Entity {
             level++;
             doEvent("advance to level %d", level);
             ai.onGainLevel();
-            modifyHp(level * 2);
+            modifyHp(level * 2, null);
         }
     }
 
@@ -100,9 +101,9 @@ public class Creature implements Entity {
             maxFood = maxFood + food / 2;
             food = maxFood;
             notify("You can't believe your stomach can hold that much!");
-            modifyHp(-1);
+            modifyHp(-1, "killed by ruptured stomach.");
         } else if (food < 1 && isPlayer()) {
-            modifyHp(-1000);
+            modifyHp(-1000, "Starved to death.");
         }
     }
 
@@ -208,8 +209,9 @@ public class Creature implements Entity {
         }
     }
 
-    public void modifyHp(int amount) {
+    public void modifyHp(int amount, String causeOfDeath) {
         hp += amount;
+        this.causeOfDeath = causeOfDeath;
 
         if (hp > maxHp) {
             hp = maxHp;
@@ -291,24 +293,52 @@ public class Creature implements Entity {
     }
 
     public void doEvent(String message, Object... params) {
+        for (Creature other : getCreaturesWhoSeeMe()) {
+            if (other == this) {
+                other.notify("You " + message + ".", params);
+            } else {
+                other.notify(String.format(
+                        "The '%s' %s.",
+                        name, makeSecondPerson(message)),
+                        params);
+            }
+        }
+    }
+
+    public void doEvent(Item item, String message, Object... params) {
+        if (hp < 1) {
+            return;
+        }
+        for (Creature other : getCreaturesWhoSeeMe()) {
+            if (other == this) {
+                other.notify("You " + message + ".", params);
+            } else {
+                other.notify(String.format(
+                        "The '%s' %s.",
+                        name, makeSecondPerson(message)),
+                        params);
+            }
+            other.learnName(item);
+        }
+
+    }
+
+    private List<Creature> getCreaturesWhoSeeMe() {
+        List<Creature> others = new ArrayList<>();
         int r = 9;
         for (int ox = -r; ox < r + 1; ox++) {
             for (int oy = -r; oy < r + 1; oy++) {
                 if (ox * ox + oy * oy <= r * r) {
                     Creature other = getWorldCreature(x + ox, y + oy, z);
-                    if (other != null) {
-                        if (other == this)
-                            other.notify("You " + message + ".", params);
-                        else if (other.canSee(x, y, z)) {
-                            other.notify(String.format(
-                                    "The '%s' %s.",
-                                    name, makeSecondPerson(message)),
-                                    params);
-                        }
+                    if (other == null) {
+                        continue;
+                    } else {
+                        others.add(other);
                     }
                 }
             }
         }
+        return others;
     }
 
     private String makeSecondPerson(String text) {
@@ -372,7 +402,7 @@ public class Creature implements Entity {
         if (inventory.isFull() || item == null) {
             doEvent("grab at the ground");
         } else {
-            doEvent("pickup a %s", item.getName());
+            doEvent("pickup a %s", nameOf(item));
             world.remove(x, y, z);
             inventory.add(item);
         }
@@ -380,16 +410,16 @@ public class Creature implements Entity {
 
     public void drop(Item item) {
         if (world.addAtEmptySpace(item, x, y, z)) {
-            doEvent("drop a " + item.getName());
+            doEvent("drop a " + nameOf(item));
             inventory.remove(item);
             unEquip(item);
         } else {
-            notify("There's nowhere to drop the %s.", item.getName());
+            notify("There's nowhere to drop the %s.", nameOf(item));
         }
     }
 
     public void leaveCorpse() {
-        Item corpse = new Item('%', color, name + " corpse");
+        Item corpse = new Item('%', color, name + " corpse", null);
         corpse.modifyFoodValue(maxHp * 3);
         world.addAtEmptySpace(corpse, x, y, z);
         for (Item item : inventory.getItems()) {
@@ -410,9 +440,9 @@ public class Creature implements Entity {
     public void unEquip(Item item) {
         if (item != null) {
             if (item == armor) {
-                doEvent("unequipped a " + item.getName());
+                doEvent("unequipped a " + nameOf(item));
             } else if (item == weapon) {
-                doEvent("put away a " + item.getName());
+                doEvent("put away a " + nameOf(item));
                 weapon = null;
             }
         }
@@ -421,7 +451,7 @@ public class Creature implements Entity {
     public void equip(Item item) {
         if (!inventory.contains(item)) {
             if (inventory.isFull()) {
-                notify("Can't equip %s since you're holding too much stuff", item.getName());
+                notify("Can't equip %s since you're holding too much stuff", nameOf(item));
             } else {
                 world.removeItem(item);
                 inventory.add(item);
@@ -430,11 +460,11 @@ public class Creature implements Entity {
         if (item.getAttackValue() != 0 || item.getDefenseValue() != 0) {
             if (item.getAttackValue() >= item.getDefenseValue()) {
                 unEquip(weapon);
-                doEvent("wield a " + item.getName());
+                doEvent("wield a " + nameOf(item));
                 weapon = item;
             } else {
                 unEquip(armor);
-                doEvent("put on a " + item.getName());
+                doEvent("put on a " + nameOf(item));
                 armor = item;
             }
         }
@@ -461,7 +491,7 @@ public class Creature implements Entity {
         if (c != null) {
             throwAttack(item, c);
         } else {
-            doEvent("throw a %s", item.getName());
+            doEvent("throw a %s", nameOf(item));
         }
 
         if (item.getQuaffEffect() != null && c != null) {
@@ -483,7 +513,7 @@ public class Creature implements Entity {
         attack(opponent, 2,
                 attackValue / 2 + item.getThrownAttackValue(),
                 "throw a %s at the %s for %d damage",
-                item.getName(),
+                nameOf(item),
                 opponent.getName());
         opponent.addEffect(item.getQuaffEffect());
     }
@@ -492,7 +522,7 @@ public class Creature implements Entity {
         attack(opponent, 2,
                 attackValue / 2 + weapon.getRangedAttackValue(),
                 "fire a %s at the %s for %d damage",
-                weapon.getName(),
+                nameOf(weapon),
                 opponent.getName());
     }
 
@@ -505,7 +535,7 @@ public class Creature implements Entity {
         System.arraycopy(params, 0, params2, 0, params.length);
         params2[params2.length - 1] = amount;
         doEvent(action, params2);
-        opponent.modifyHp(-amount);
+        opponent.modifyHp(-amount, "Killed by a " + name);
 
         if (opponent.getHp() < 1) {
             gainXp(opponent);
@@ -538,7 +568,7 @@ public class Creature implements Entity {
     private void regenerateHealth() {
         regenHpCooldown -= regenHpPer1000;
         if (regenHpCooldown < 0) {
-            modifyHp(1);
+            modifyHp(1, null);
             modifyFood(-1);
             regenHpCooldown += 1000;
         }
@@ -557,12 +587,12 @@ public class Creature implements Entity {
     }
 
     public void quaff(Item item) {
-        doEvent("quaff a " + item.getName());
+        doEvent(item, "quaff a " + nameOf(item));
         consume(item);
     }
 
     public void eat(Item item) {
-        doEvent("eat a " + item.getName());
+        doEvent("eat a " + nameOf(item));
         consume(item);
     }
 
@@ -644,6 +674,19 @@ public class Creature implements Entity {
 
         opponent.addEffect(spell.getEffect());
         modifyMana(-spell.getManaCost());
+    }
+
+    public String nameOf(Item item) {
+        return ai.getName(item);
+    }
+
+    public void learnName(Item item) {
+        notify("The " + item.getAppearance() + " is a " + item.getName() + "!");
+        ai.setName(item, item.getName());
+    }
+
+    public String getCauseOfDeath() {
+        return causeOfDeath;
     }
 
 }

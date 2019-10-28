@@ -158,7 +158,7 @@ public class World {
                 items[p.getX()][p.getY()][p.getZ()] = item;
                 Creature c = this.getCreature(p.getX(), p.getY(), p.getZ());
                 if (c != null) {
-                    c.doEvent("A %s lands between your feet.", item.getName());
+                    c.doEvent("A %s lands between your feet.", item.getAppearance());
                 }
                 return true;
             } else {
