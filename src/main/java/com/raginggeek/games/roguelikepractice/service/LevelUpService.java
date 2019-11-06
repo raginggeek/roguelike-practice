@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class LevelUpService {
+    //TODO: consider updating to use a sqlite database?
     private static LevelUpOption[] options = new LevelUpOption[]{
             new LevelUpOption("Increased hit points") {
                 @Override
