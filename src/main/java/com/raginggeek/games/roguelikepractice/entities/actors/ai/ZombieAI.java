@@ -12,7 +12,7 @@ public class ZombieAI extends AggressiveCreatureAI {
 
     public void onUpdate() {
         if (Math.random() >= 0.2) {
-            if (creature.canSee(player.getX(), player.getY(), player.getZ())) {
+            if (creature.canSee(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ())) {
                 hunt(player);
             } else {
                 wander();

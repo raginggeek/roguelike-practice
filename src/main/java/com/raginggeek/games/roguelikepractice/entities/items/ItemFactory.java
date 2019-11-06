@@ -4,6 +4,7 @@ import asciiPanel.AsciiPanel;
 import com.raginggeek.games.roguelikepractice.entities.actors.Creature;
 import com.raginggeek.games.roguelikepractice.entities.actors.CreatureFactory;
 import com.raginggeek.games.roguelikepractice.entities.effects.Effect;
+import com.raginggeek.games.roguelikepractice.world.Point;
 import com.raginggeek.games.roguelikepractice.world.World;
 
 import java.awt.*;
@@ -323,10 +324,10 @@ public class ItemFactory {
                 do {
                     mx = (int) (Math.random() * 11) - 5;
                     my = (int) (Math.random() * 11) - 5;
-                } while (!creature.canEnter(creature.getX() + mx, creature.getY() + my, creature.getZ()) &&
-                        creature.canSee(creature.getX() + mx, creature.getY() + my, creature.getZ()));
+                } while (!creature.canEnter(creature.getLocation().getX() + mx, creature.getLocation().getY() + my, creature.getLocation().getZ()) &&
+                        creature.canSee(creature.getLocation().getX() + mx, creature.getLocation().getY() + my, creature.getLocation().getZ()));
 
-                creature.moveBy(mx, my, 0);
+                creature.moveBy(new Point(mx, my, 0));
                 creature.doEvent("fade in");
             }
 
@@ -342,22 +343,22 @@ public class ItemFactory {
                 creatureFactory = new CreatureFactory(world);
                 for (int ox = -1; ox < 2; ox++) {
                     for (int oy = -1; oy < 2; oy++) {
-                        int nx = creature.getX() + ox;
-                        int ny = creature.getY() + oy;
-                        if (ox == 0 && oy == 0 || creature.getWorldCreature(nx, ny, creature.getZ()) != null) {
+                        int nx = creature.getLocation().getX() + ox;
+                        int ny = creature.getLocation().getY() + oy;
+                        if (ox == 0 && oy == 0 || creature.getWorldCreature(nx, ny, creature.getLocation().getZ()) != null) {
                             continue;
                         }
 
                         Creature bat = creatureFactory.newBat(0);
 
-                        if (!bat.canEnter(nx, ny, creature.getZ())) {
+                        if (!bat.canEnter(nx, ny, creature.getLocation().getZ())) {
                             world.removeCreature(bat);
                             continue;
                         }
 
-                        bat.setX(nx);
-                        bat.setY(ny);
-                        bat.setZ(creature.getZ());
+                        bat.getLocation().setX(nx);
+                        bat.getLocation().setY(ny);
+                        bat.getLocation().setZ(creature.getLocation().getZ());
 
                         creature.summon(bat);
 

@@ -11,8 +11,8 @@ public class Path {
 
     public Path(Creature creature, int x, int y) {
         points = pf.findPath(creature,
-                new Point(creature.getX(), creature.getY(), creature.getZ()),
-                new Point(x, y, creature.getZ()),
+                creature.getLocation().clone(),
+                new Point(x, y, creature.getLocation().getZ()),
                 300);
     }
 

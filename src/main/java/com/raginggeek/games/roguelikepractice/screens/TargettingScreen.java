@@ -72,18 +72,18 @@ public abstract class TargettingScreen implements Screen {
                 y++;
                 break;
             case KeyEvent.VK_ENTER:
-                selectWorldCoordinate(player.getX() + x, player.getY() + y, sx + x, sy + y);
+                selectWorldCoordinate(player.getLocation().getX() + x, player.getLocation().getY() + y, sx + x, sy + y);
                 return null;
             case KeyEvent.VK_ESCAPE:
                 return null;
         }
 
-        if (!isAcceptable(player.getX() + x, player.getY() + y)) {
+        if (!isAcceptable(player.getLocation().getX() + x, player.getLocation().getY() + y)) {
             x = px;
             y = py;
         }
 
-        enterWorldCoordinate(player.getX() + x, player.getY() + y, sx + x, sy + y);
+        enterWorldCoordinate(player.getLocation().getX() + x, player.getLocation().getY() + y, sx + x, sy + y);
 
         return this;
     }

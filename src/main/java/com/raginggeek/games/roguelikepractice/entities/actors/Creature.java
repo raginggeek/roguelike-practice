@@ -24,9 +24,7 @@ public class Creature implements Entity {
     private CreatureAI ai;
     private List<Effect> effects;
 
-    private int x;
-    private int y;
-    private int z;
+    private Point location = new Point(0, 0, 0);
     private char glyph;
     private String name;
     private Color color;
@@ -122,32 +120,37 @@ public class Creature implements Entity {
         doEvent("dig");
     }
 
-    public void moveBy(int mx, int my, int mz) {
-        if (mx == 0 && my == 0 && mz == 0) {
+    public void moveBy(Point vector) {
+        //TODO: move this into some kind of world proxy, and change inputs to method and arguments to world proxy to be point and vector.
+        if (vector.getX() == 0 && vector.getY() == 0 && vector.getZ() == 0) {
             return;
         }
-        Tile tile = world.getTile(x + mx, y + my, z + mz);
+        Tile tile = world.getTile(location.getX() + vector.getX(),
+                location.getY() + vector.getY(),
+                location.getZ() + vector.getZ());
 
-        if (mz == -1) {
+        if (vector.getZ() == -1) {
             if (tile == Tile.STAIRS_DOWN) {
-                doEvent("wall up the stairs to level %d", z + mz + 1);
+                doEvent("wall up the stairs to level %d", location.getZ() + vector.getZ() + 1);
             } else {
                 doEvent("try to go up but are stopped by the cave ceiling");
                 return;
             }
-        } else if (mz == 1) {
+        } else if (vector.getZ() == 1) {
             if (tile == Tile.STAIRS_UP) {
-                doEvent("walk down the stairs to level %d", z + mz + 1);
+                doEvent("walk down the stairs to level %d", location.getZ() + vector.getZ() + 1);
             } else {
                 doEvent("try to go down but are stopped by the cave floor");
                 return;
             }
         }
 
-        Creature opponent = world.getCreature(x + mx, y + my, z + mz);
+        Creature opponent = world.getCreature(location.getX() + vector.getX(),
+                location.getY() + vector.getY(),
+                location.getZ() + vector.getZ());
 
         if (opponent == null) {
-            ai.onEnter(x + mx, y + my, z + mz, tile);
+            ai.onEnter(location.getX() + vector.getX(), location.getY() + vector.getY(), location.getZ() + vector.getZ(), tile);
         } else {
             meleeAttack(opponent);
         }
@@ -273,7 +276,7 @@ public class Creature implements Entity {
         for (int ox = -r; ox < r + 1; ox++) {
             for (int oy = -r; oy < r + 1; oy++) {
                 if (ox * ox + oy * oy <= r * r) {
-                    Creature other = getWorldCreature(x + ox, y + oy, z);
+                    Creature other = getWorldCreature(location.getX() + ox, location.getY() + oy, location.getZ());
                     if (other == null) {
                         continue;
                     } else {
@@ -341,19 +344,19 @@ public class Creature implements Entity {
     }
 
     public void pickup() {
-        Item item = world.getItem(x, y, z);
+        Item item = world.getItem(location.getX(), location.getY(), location.getZ());
 
         if (inventory.isFull() || item == null) {
             doEvent("grab at the ground");
         } else {
             doEvent("pickup a %s", nameOf(item));
-            world.remove(x, y, z);
+            world.remove(location.getX(), location.getY(), location.getZ());
             inventory.add(item);
         }
     }
 
     public void drop(Item item) {
-        if (world.addAtEmptySpace(item, x, y, z)) {
+        if (world.addAtEmptySpace(item, location.getX(), location.getY(), location.getZ())) {
             doEvent("drop a " + nameOf(item));
             inventory.remove(item);
             unEquip(item);
@@ -365,7 +368,7 @@ public class Creature implements Entity {
     public void leaveCorpse() {
         Item corpse = new Item('%', color, name + " corpse", null);
         corpse.modifyFoodValue(maxHp * 3);
-        world.addAtEmptySpace(corpse, x, y, z);
+        world.addAtEmptySpace(corpse, location.getX(), location.getY(), location.getZ());
         for (Item item : inventory.getItems()) {
             if (item != null) {
                 drop(item);
@@ -411,10 +414,10 @@ public class Creature implements Entity {
     }
 
     public void throwItem(Item item, int wx, int wy, int wz) {
-        Point end = new Point(x, y, 0);
+        Point end = new Point(location.getX(), location.getY(), 0);
 
-        for (Point p : new Line(x, y, wx, wy)) {
-            if (!getRealTile(p.getX(), p.getY(), z).isGround()) {
+        for (Point p : new Line(location.getX(), location.getY(), wx, wy)) {
+            if (!getRealTile(p.getX(), p.getY(), location.getZ()).isGround()) {
                 break;
             }
             end = p;
@@ -586,7 +589,7 @@ public class Creature implements Entity {
     }
 
     public void castSpell(Spell spell, int x2, int y2) {
-        Creature opponent = getWorldCreature(x2, y2, z);
+        Creature opponent = getWorldCreature(x2, y2, location.getZ());
 
         if (spell.getManaCost() > mana) {
             doEvent("point and mumble but nothing happens");

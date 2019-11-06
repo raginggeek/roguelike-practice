@@ -16,8 +16,8 @@ public class GoblinAI extends SentientAggressiveCreatureAI {
         if (canRangedWeaponAttack(player)) {
             creature.rangedWeaponAttack(player);
         } else if (canThrowAt(player)) {
-            creature.throwItem(getWeaponToThrow(), player.getX(), player.getY(), player.getZ());
-        } else if (creature.canSee(player.getX(), player.getY(), player.getZ())) {
+            creature.throwItem(getWeaponToThrow(), player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ());
+        } else if (creature.canSee(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ())) {
             hunt(player);
         } else if (canPickup()) {
             creature.pickup();

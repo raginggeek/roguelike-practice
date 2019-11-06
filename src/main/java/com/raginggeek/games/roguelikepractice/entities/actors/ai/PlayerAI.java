@@ -2,6 +2,7 @@ package com.raginggeek.games.roguelikepractice.entities.actors.ai;
 
 import com.raginggeek.games.roguelikepractice.entities.actors.Creature;
 import com.raginggeek.games.roguelikepractice.entities.actors.capabilities.FieldOfView;
+import com.raginggeek.games.roguelikepractice.world.Point;
 import com.raginggeek.games.roguelikepractice.world.Tile;
 
 import java.util.List;
@@ -18,9 +19,7 @@ public class PlayerAI extends CreatureAI {
 
     public void onEnter(int x, int y, int z, Tile tile) {
         if (tile.isGround()) {
-            creature.setX(x);
-            creature.setY(y);
-            creature.setZ(z);
+            creature.setLocation(new Point(x, y, z));
         } else if (tile.isDiggable()) {
             creature.dig(x, y, z);
         }

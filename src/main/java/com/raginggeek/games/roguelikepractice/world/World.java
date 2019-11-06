@@ -88,9 +88,7 @@ public class World {
 
         if (entity instanceof Creature) {
             Creature creature = (Creature) entity;
-            creature.setX(x);
-            creature.setY(y);
-            creature.setZ(z);
+            creature.setLocation(new Point(x, y, z));
             creatures.add(creature);
         }
         if (entity instanceof Item) {
@@ -103,7 +101,7 @@ public class World {
     public Creature getCreature(int x, int y, int z) {
         if (creatures != null) {
             for (Creature c : creatures) {
-                if (c.getX() == x && c.getY() == y && c.getZ() == z) {
+                if (c.getLocation().getX() == x && c.getLocation().getY() == y && c.getLocation().getZ() == z) {
                     return c;
                 }
             }

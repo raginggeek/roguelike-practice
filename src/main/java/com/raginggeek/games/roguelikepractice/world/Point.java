@@ -1,43 +1,18 @@
 package com.raginggeek.games.roguelikepractice.world;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@Data
+@AllArgsConstructor
 public class Point {
     private int x;
     private int y;
     private int z;
-
-    public Point(int x, int y, int z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-    }
-
-    public int getX() {
-        return x;
-    }
-
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public void setY(int y) {
-        this.y = y;
-    }
-
-    public int getZ() {
-        return z;
-    }
-
-    public void setZ(int z) {
-        this.z = z;
-    }
 
     public List<Point> neighbors8() {
         List<Point> points = new ArrayList<>();
@@ -59,6 +34,16 @@ public class Point {
         }
         Collections.shuffle(points);
         return points;
+    }
+
+    public void add(Point vector) {
+        x += vector.getX();
+        y += vector.getY();
+        z += vector.getZ();
+    }
+
+    public Point clone() {
+        return new Point(x, y, z);
     }
 
     @Override
