@@ -3,11 +3,13 @@ package com.raginggeek.games.roguelikepractice.entities.items;
 import com.raginggeek.games.roguelikepractice.entities.Entity;
 import com.raginggeek.games.roguelikepractice.entities.effects.Effect;
 import com.raginggeek.games.roguelikepractice.entities.effects.Spell;
+import lombok.Getter;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 public class Item implements Entity {
     private Effect quaffEffect;
     private List<Spell> writtenSpells;
@@ -30,36 +32,12 @@ public class Item implements Entity {
         writtenSpells = new ArrayList<>();
     }
 
-    public char getGlyph() {
-        return glyph;
-    }
-
-    public Color getColor() {
-        return color;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getFoodValue() {
-        return foodValue;
-    }
-
     public void modifyFoodValue(int amount) {
         foodValue += amount;
     }
 
-    public int getAttackValue() {
-        return attackValue;
-    }
-
     public void modifyAttackValue(int amount) {
         attackValue += amount;
-    }
-
-    public int getDefenseValue() {
-        return defenseValue;
     }
 
     public void modifyDefenseValue(int amount) {
@@ -83,32 +61,16 @@ public class Item implements Entity {
         return details;
     }
 
-    public int getThrownAttackValue() {
-        return thrownAttackValue;
-    }
-
     public void modifyThrownAttackValue(int amount) {
         thrownAttackValue += amount;
-    }
-
-    public int getRangedAttackValue() {
-        return rangedAttackValue;
     }
 
     public void modifyRangedAttackValue(int amount) {
         rangedAttackValue += amount;
     }
 
-    public Effect getQuaffEffect() {
-        return quaffEffect;
-    }
-
     public void setQuaffEffect(Effect effect) {
         quaffEffect = effect;
-    }
-
-    public List<Spell> getWrittenSpells() {
-        return writtenSpells;
     }
 
     public void addWrittenSpell(String name, int manaCost, Effect effect) {

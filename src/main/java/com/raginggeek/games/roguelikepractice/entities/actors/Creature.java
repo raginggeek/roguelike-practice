@@ -10,11 +10,15 @@ import com.raginggeek.games.roguelikepractice.world.Line;
 import com.raginggeek.games.roguelikepractice.world.Point;
 import com.raginggeek.games.roguelikepractice.world.Tile;
 import com.raginggeek.games.roguelikepractice.world.World;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
+@Setter
 public class Creature implements Entity {
     private World world;
     private CreatureAI ai;
@@ -49,7 +53,6 @@ public class Creature implements Entity {
     private String causeOfDeath;
 
 
-
     public Creature(World world, char glyph, Color color, int maxHp, int attack, int defense) {
         this.world = world;
         this.glyph = glyph;
@@ -68,10 +71,6 @@ public class Creature implements Entity {
 
     }
 
-    public int getXp() {
-        return xp;
-    }
-
     public void modifyXp(int amount) {
         xp += amount;
         notify("You %s %d xp.", amount < 0 ? "lose" : "gain", amount);
@@ -81,18 +80,6 @@ public class Creature implements Entity {
             ai.onGainLevel();
             modifyHp(level * 2, null);
         }
-    }
-
-    public int getLevel() {
-        return level;
-    }
-
-    public int getMaxFood() {
-        return maxFood;
-    }
-
-    public int getFood() {
-        return food;
     }
 
     public void modifyFood(int amount) {
@@ -111,13 +98,6 @@ public class Creature implements Entity {
         return glyph == '@';
     }
 
-    public int getMaxHp() {
-        return maxHp;
-    }
-
-    public int getHp() {
-        return hp;
-    }
 
     public int getAttackValue() {
         return attackValue +
@@ -131,45 +111,9 @@ public class Creature implements Entity {
                 (weapon == null ? 0 : weapon.getDefenseValue());
     }
 
-    public String getName() {
-        return name;
-    }
-
     public void setCreatureAi(CreatureAI ai) {
         this.ai = ai;
         this.name = ai.getName();
-    }
-
-    public Color getColor() {
-        return color;
-    }
-
-    public char getGlyph() {
-        return glyph;
-    }
-
-    public int getX() {
-        return x;
-    }
-
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public void setY(int y) {
-        this.y = y;
-    }
-
-    public int getZ() {
-        return z;
-    }
-
-    public void setZ(int z) {
-        this.z = z;
     }
 
     public void dig(int wx, int wy, int wz) {
@@ -429,14 +373,6 @@ public class Creature implements Entity {
         }
     }
 
-    public Item getWeapon() {
-        return weapon;
-    }
-
-    public Item getArmor() {
-        return armor;
-    }
-
     public void unEquip(Item item) {
         if (item != null) {
             if (item == armor) {
@@ -626,14 +562,6 @@ public class Creature implements Entity {
         effects.removeAll(done);
     }
 
-    public int getMaxMana() {
-        return maxMana;
-    }
-
-    public int getMana() {
-        return mana;
-    }
-
     public void modifyMana(int amount) {
         mana = Math.max(0, Math.min(mana + amount, maxMana));
     }
@@ -651,10 +579,6 @@ public class Creature implements Entity {
 
     public void summon(Creature other) {
         world.add(other);
-    }
-
-    public int getDetectCreatures() {
-        return detectCreatures;
     }
 
     public void modifyDetectCreatures(int amount) {
@@ -683,10 +607,6 @@ public class Creature implements Entity {
     public void learnName(Item item) {
         notify("The " + item.getAppearance() + " is a " + item.getName() + "!");
         ai.setName(item, item.getName());
-    }
-
-    public String getCauseOfDeath() {
-        return causeOfDeath;
     }
 
 }

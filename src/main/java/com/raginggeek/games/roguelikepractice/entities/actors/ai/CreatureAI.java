@@ -6,10 +6,12 @@ import com.raginggeek.games.roguelikepractice.service.LevelUpService;
 import com.raginggeek.games.roguelikepractice.world.Line;
 import com.raginggeek.games.roguelikepractice.world.Point;
 import com.raginggeek.games.roguelikepractice.world.Tile;
+import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Getter
 public abstract class CreatureAI {
     protected String name;
     protected Creature creature;
@@ -27,10 +29,6 @@ public abstract class CreatureAI {
         this.creature = creature;
         this.creature.setCreatureAi(this);
         this.itemNames = new HashMap<>();
-    }
-
-    public String getName() {
-        return this.name;
     }
 
     public boolean canSee(int wx, int wy, int wz) {
