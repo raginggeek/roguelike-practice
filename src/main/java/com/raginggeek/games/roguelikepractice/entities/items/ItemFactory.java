@@ -318,16 +318,15 @@ public class ItemFactory {
         item.addWrittenSpell("blink", 6, new Effect(1) {
             public void start(Creature creature) {
                 creature.doEvent("fade out");
-                int mx = 0;
-                int my = 0;
+                Point vector = new Point(0, 0, 0);
 
                 do {
-                    mx = (int) (Math.random() * 11) - 5;
-                    my = (int) (Math.random() * 11) - 5;
-                } while (!creature.canEnter(creature.getLocation().getX() + mx, creature.getLocation().getY() + my, creature.getLocation().getZ()) &&
-                        creature.canSee(creature.getLocation().getX() + mx, creature.getLocation().getY() + my, creature.getLocation().getZ()));
+                    vector.setX((int) (Math.random() * 11) - 5);
+                    vector.setY((int) (Math.random() * 11) - 5);
+                } while (!creature.canEnter(creature.getLocation().add(vector)) &&
+                        creature.canSee(creature.getLocation().add(vector)));
 
-                creature.moveBy(new Point(mx, my, 0));
+                creature.moveBy(vector);
                 creature.doEvent("fade in");
             }
 
@@ -345,20 +344,19 @@ public class ItemFactory {
                     for (int oy = -1; oy < 2; oy++) {
                         int nx = creature.getLocation().getX() + ox;
                         int ny = creature.getLocation().getY() + oy;
-                        if (ox == 0 && oy == 0 || creature.getWorldCreature(nx, ny, creature.getLocation().getZ()) != null) {
+                        Point spawnPoint = new Point(nx, ny, creature.getLocation().getZ());
+                        if (ox == 0 && oy == 0 || creature.getWorldCreature(spawnPoint) != null) {
                             continue;
                         }
 
                         Creature bat = creatureFactory.newBat(0);
 
-                        if (!bat.canEnter(nx, ny, creature.getLocation().getZ())) {
+                        if (!bat.canEnter(spawnPoint)) {
                             world.removeCreature(bat);
                             continue;
                         }
 
-                        bat.getLocation().setX(nx);
-                        bat.getLocation().setY(ny);
-                        bat.getLocation().setZ(creature.getLocation().getZ());
+                        bat.setLocation(spawnPoint);
 
                         creature.summon(bat);
 

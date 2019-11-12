@@ -2,6 +2,7 @@ package com.raginggeek.games.roguelikepractice.entities.actors.ai;
 
 import com.raginggeek.games.roguelikepractice.entities.actors.Creature;
 import com.raginggeek.games.roguelikepractice.entities.actors.CreatureFactory;
+import com.raginggeek.games.roguelikepractice.world.Point;
 import com.raginggeek.games.roguelikepractice.world.Tile;
 
 public class FungusAI extends CreatureAI {
@@ -26,14 +27,13 @@ public class FungusAI extends CreatureAI {
     }
 
     private void spread() {
-        int x = creature.getLocation().getX() + (int) (Math.random() * 11) - 5;
-        int y = creature.getLocation().getY() + (int) (Math.random() * 11) - 5;
-        int z = creature.getLocation().getZ();
+        Point spawnVector = new Point((int) (Math.random() * 11) - 5, (int) (Math.random() * 11) - 5, 0);
+        Point spawnPoint = creature.getLocation().add(spawnVector);
 
-        if (creature.canEnter(x, y, z)) {
-            Creature child = creatureFactory.newFungus(z);
-            child.getLocation().setX(x);
-            child.getLocation().setY(y);
+        if (creature.canEnter(spawnPoint)) {
+            Creature child = creatureFactory.newFungus(spawnPoint.getZ());
+            child.getLocation().setX(spawnPoint.getX());
+            child.getLocation().setY(spawnPoint.getY());
             spreadCount++;
             creature.doEvent("spawn a child");
         }

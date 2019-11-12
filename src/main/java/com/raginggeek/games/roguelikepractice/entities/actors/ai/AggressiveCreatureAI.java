@@ -28,11 +28,11 @@ public abstract class AggressiveCreatureAI extends CreatureAI {
     protected boolean canRangedWeaponAttack(Creature opponent) {
         return creature.getWeapon() != null &&
                 creature.getWeapon().getRangedAttackValue() > 0 &&
-                creature.canSee(opponent.getLocation().getX(), opponent.getLocation().getY(), opponent.getLocation().getZ());
+                creature.canSee(opponent.getLocation());
     }
 
     protected boolean canThrowAt(Creature opponent) {
-        return creature.canSee(opponent.getLocation().getX(), opponent.getLocation().getY(), opponent.getLocation().getZ()) &&
+        return creature.canSee(opponent.getLocation()) &&
                 getWeaponToThrow() != null;
     }
 
@@ -53,7 +53,7 @@ public abstract class AggressiveCreatureAI extends CreatureAI {
     }
 
     protected boolean canPickup() {
-        return creature.getItem(creature.getLocation().getX(), creature.getLocation().getY(), creature.getLocation().getZ()) != null &&
+        return creature.getItem(creature.getLocation()) != null &&
                 !creature.getInventory().isFull();
     }
 }

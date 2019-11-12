@@ -3,11 +3,13 @@ package com.raginggeek.games.roguelikepractice.world;
 import com.raginggeek.games.roguelikepractice.entities.Entity;
 import com.raginggeek.games.roguelikepractice.entities.actors.Creature;
 import com.raginggeek.games.roguelikepractice.entities.items.Item;
+import lombok.extern.slf4j.Slf4j;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class World {
     private Tile[][][] tiles;
     private Item[][][] items;
@@ -37,58 +39,60 @@ public class World {
         return depth;
     }
 
-    public Tile getTile(int x, int y, int z) {
-        if (x < 0 || x >= width || y < 0 || y >= height) {
+    public Tile getTile(Point location) {
+        if (location.getX() < 0 || location.getX() >= width ||
+                location.getY() < 0 || location.getY() >= height) {
             return Tile.BOUNDS;
         } else {
-            return tiles[x][y][z];
+            return tiles[location.getX()][location.getY()][location.getZ()];
         }
     }
 
-    public char getGlyph(int x, int y, int z) {
-        Creature creature = getCreature(x, y, z);
+    public char getGlyph(Point location) {
+        Creature creature = getCreature(location);
         if (creature != null) {
             return creature.getGlyph();
         }
 
-        if (getItem(x, y, z) != null) {
-            return getItem(x, y, z).getGlyph();
+        if (getItem(location) != null) {
+            return getItem(location).getGlyph();
         }
 
-        return getTile(x, y, z).getGlyph();
+        return getTile(location).getGlyph();
     }
 
-    public Color getColor(int x, int y, int z) {
-        Creature creature = getCreature(x, y, z);
+    public Color getColor(Point location) {
+        Creature creature = getCreature(location);
         if (creature != null) {
             return creature.getColor();
         }
 
-        if (getItem(x, y, z) != null) {
-            return getItem(x, y, z).getColor();
+        if (getItem(location) != null) {
+            return getItem(location).getColor();
         }
 
-        return getTile(x, y, z).getColor();
+        return getTile(location).getColor();
     }
 
-    public void dig(int x, int y, int z) {
-        if (tiles[x][y][z].isDiggable()) {
-            tiles[x][y][z] = Tile.FLOOR;
+    public void dig(Point location) {
+        if (tiles[location.getX()][location.getY()][location.getZ()].isDiggable()) {
+            tiles[location.getX()][location.getY()][location.getZ()] = Tile.FLOOR;
         }
     }
 
     public void addAtEmptyLocation(Entity entity, int z) {
         int x;
         int y;
+        Point point;
 
         do {
             x = (int) (Math.random() * width);
             y = (int) (Math.random() * height);
-        } while (!canEnter(x, y, z));
+        } while (!canEnter(point = new Point(x, y, z)));
 
         if (entity instanceof Creature) {
             Creature creature = (Creature) entity;
-            creature.setLocation(new Point(x, y, z));
+            creature.setLocation(point);
             creatures.add(creature);
         }
         if (entity instanceof Item) {
@@ -98,10 +102,10 @@ public class World {
 
     }
 
-    public Creature getCreature(int x, int y, int z) {
+    public Creature getCreature(Point location) {
         if (creatures != null) {
             for (Creature c : creatures) {
-                if (c.getLocation().getX() == x && c.getLocation().getY() == y && c.getLocation().getZ() == z) {
+                if (location.equals(c.getLocation())) {
                     return c;
                 }
             }
@@ -109,8 +113,9 @@ public class World {
         return null;
     }
 
-    public Item getItem(int x, int y, int z) {
-        return items[x][y][z];
+    public Item getItem(Point location) {
+        //log.info("attempting to gather item at " + location.getX() + "," + location.getY() + "," + location.getZ());
+        return items[location.getX()][location.getY()][location.getZ()];
     }
 
     public List<Creature> getCreatures() {
@@ -121,8 +126,12 @@ public class World {
         creatures.remove(creature);
     }
 
-    public boolean canEnter(int x, int y, int z) {
-        return x > 0 && x < width && y > 0 && y < height && z >= 0 && z < depth && tiles[x][y][z].isGround() && getCreature(x, y, z) == null;
+    public boolean canEnter(Point location) {
+        return location.getX() > 0 && location.getX() < width &&
+                location.getY() > 0 && location.getY() < height &&
+                location.getZ() >= 0 && location.getZ() < depth &&
+                tiles[location.getX()][location.getY()][location.getZ()].isGround() &&
+                getCreature(location) == null;
     }
 
     public void update() {
@@ -132,29 +141,29 @@ public class World {
         }
     }
 
-    public void remove(int x, int y, int z) {
-        items[x][y][z] = null;
+    public void remove(Point location) {
+        items[location.getX()][location.getY()][location.getZ()] = null;
     }
 
-    public boolean addAtEmptySpace(Item item, int x, int y, int z) {
+    public boolean addAtEmptySpace(Item item, Point location) {
         if (item == null) {
             return true;
         }
         List<Point> points = new ArrayList<>();
         List<Point> checked = new ArrayList<>();
 
-        points.add(new Point(x, y, z));
+        points.add(location);
 
         while (!points.isEmpty()) {
             Point p = points.remove(0);
             checked.add(p);
-            if (!getTile(p.getX(), p.getY(), p.getZ()).isGround()) {
+            if (!getTile(p).isGround()) {
                 continue;
             }
 
             if (items[p.getX()][p.getY()][p.getZ()] == null) {
                 items[p.getX()][p.getY()][p.getZ()] = item;
-                Creature c = this.getCreature(p.getX(), p.getY(), p.getZ());
+                Creature c = this.getCreature(p);
                 if (c != null) {
                     c.doEvent("A %s lands between your feet.", item.getAppearance());
                 }

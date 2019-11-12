@@ -42,7 +42,8 @@ public class FieldOfView {
                 }
 
                 for (Point p : new Line(wx, wy, wx + x, wy + y)) {
-                    Tile tile = world.getTile(p.getX(), p.getY(), wz);
+                    p.setZ(wz);
+                    Tile tile = world.getTile(p);
                     visible[p.getX()][p.getY()] = true;
                     tiles[p.getX()][p.getY()][wz] = tile;
 
@@ -54,15 +55,15 @@ public class FieldOfView {
         }
     }
 
-    public boolean isVisible(int x, int y, int z) {
-        return z == depth &&
-                x >= 0 &&
-                x < visible.length &&
-                y < visible[0].length &&
-                visible[x][y];
+    public boolean isVisible(Point location) {
+        return location.getZ() == depth &&
+                location.getX() >= 0 &&
+                location.getX() < visible.length &&
+                location.getY() < visible[0].length &&
+                visible[location.getX()][location.getY()];
     }
 
-    public Tile getTile(int x, int y, int z) {
-        return tiles[x][y][z];
+    public Tile getTile(Point location) {
+        return tiles[location.getX()][location.getY()][location.getZ()];
     }
 }

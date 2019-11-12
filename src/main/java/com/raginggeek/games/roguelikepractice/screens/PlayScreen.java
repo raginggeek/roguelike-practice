@@ -164,10 +164,11 @@ public class PlayScreen implements Screen {
             for (int y = 0; y < screenHeight; y++) {
                 int wx = x + left;
                 int wy = y + top;
-                if (player.canSee(wx, wy, player.getLocation().getZ())) {
-                    terminal.write(world.getGlyph(wx, wy, player.getLocation().getZ()), x, y, world.getColor(wx, wy, player.getLocation().getZ()));
+                Point displayTarget = new Point(wx, wy, player.getLocation().getZ());
+                if (player.canSee(displayTarget)) {
+                    terminal.write(world.getGlyph(displayTarget), x, y, world.getColor(displayTarget));
                 } else {
-                    terminal.write(fov.getTile(wx, wy, player.getLocation().getZ()).getGlyph(), x, y, Color.darkGray);
+                    terminal.write(fov.getTile(displayTarget).getGlyph(), x, y, Color.darkGray);
                 }
 
             }
@@ -239,7 +240,7 @@ public class PlayScreen implements Screen {
 
     private boolean userIsTryingToExit() {
         return player.getLocation().getZ() == 0 &&
-                world.getTile(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ()) == Tile.STAIRS_UP;
+                world.getTile(player.getLocation()) == Tile.STAIRS_UP;
     }
 
     private Screen userExits() {

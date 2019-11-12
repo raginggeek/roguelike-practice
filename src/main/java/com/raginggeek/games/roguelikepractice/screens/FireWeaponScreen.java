@@ -11,12 +11,13 @@ public class FireWeaponScreen extends TargettingScreen {
     }
 
     public boolean isAcceptable(int x, int y) {
-        if (!player.canSee(x, y, player.getLocation().getZ())) {
+        if (!player.canSee(new Point(x, y, player.getLocation().getZ()))) {
             return false;
         }
 
         for (Point p : new Line(player.getLocation().getX(), player.getLocation().getY(), x, y)) {
-            if (!player.getRealTile(p.getX(), p.getY(), player.getLocation().getZ()).isGround()) {
+            p.setZ(player.getLocation().getZ());
+            if (!player.getRealTile(p).isGround()) {
                 return false;
             }
         }
@@ -29,7 +30,7 @@ public class FireWeaponScreen extends TargettingScreen {
 
     @Override
     public void selectWorldCoordinate(int x, int y, int screenX, int screenY) {
-        Creature opponent = player.getWorldCreature(x, y, player.getLocation().getZ());
+        Creature opponent = player.getWorldCreature(new Point(x, y, player.getLocation().getZ()));
 
         if (opponent == null) {
             player.notify("There's no one there to fire at.");

@@ -14,12 +14,12 @@ public class TargetThrowScreen extends TargettingScreen {
     }
 
     public boolean isAcceptable(int x, int y) {
-        if (!player.canSee(x, y, player.getLocation().getZ())) {
+        if (!player.canSee(new Point(x, y, player.getLocation().getZ()))) {
             return false;
         }
 
         for (Point p : new Line(player.getLocation().getX(), player.getLocation().getY(), x, y)) {
-            if (!player.getRealTile(p.getX(), p.getY(), player.getLocation().getZ()).isGround()) {
+            if (!player.getRealTile(new Point(p.getX(), p.getY(), player.getLocation().getZ())).isGround()) {
                 return false;
             }
         }
@@ -34,6 +34,6 @@ public class TargetThrowScreen extends TargettingScreen {
 
     @Override
     public void selectWorldCoordinate(int x, int y, int screenX, int screenY) {
-        player.throwItem(item, x, y, player.getLocation().getZ());
+        player.throwItem(item, new Point(x, y, player.getLocation().getZ()));
     }
 }

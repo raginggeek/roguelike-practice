@@ -36,10 +36,10 @@ public class Point {
         return points;
     }
 
-    public void add(Point vector) {
-        x += vector.getX();
-        y += vector.getY();
-        z += vector.getZ();
+    public Point add(Point vector) {
+        return new Point(x + vector.getX(),
+                y + vector.getY(),
+                z + vector.getZ());
     }
 
     public Point clone() {

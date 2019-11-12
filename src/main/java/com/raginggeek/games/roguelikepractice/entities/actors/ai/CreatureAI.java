@@ -31,19 +31,20 @@ public abstract class CreatureAI {
         this.itemNames = new HashMap<>();
     }
 
-    public boolean canSee(int wx, int wy, int wz) {
-        if (creature.getLocation().getZ() != wz) {
+    public boolean canSee(Point targetLocation) {
+        if (creature.getLocation().getZ() != targetLocation.getZ()) {
             return false; // can't see through floors and ceilings
         }
 
-        if ((creature.getLocation().getX() - wx) * (creature.getLocation().getX() - wx)
-                + (creature.getLocation().getY() - wy) * (creature.getLocation().getY() - wy)
+        if ((creature.getLocation().getX() - targetLocation.getX()) * (creature.getLocation().getX() - targetLocation.getX())
+                + (creature.getLocation().getY() - targetLocation.getY()) * (creature.getLocation().getY() - targetLocation.getY())
                 > creature.getVisionRadius() * creature.getVisionRadius()) {
             return false;
         }
 
-        for (Point p : new Line(creature.getLocation().getX(), creature.getLocation().getY(), wx, wy)) {
-            if (creature.getRealTile(p.getX(), p.getY(), wz).isGround() || p.getX() == wx && p.getY() == wy) {
+        for (Point p : new Line(creature.getLocation().getX(), creature.getLocation().getY(), targetLocation.getX(), targetLocation.getY())) {
+            p.setZ(targetLocation.getZ());
+            if (creature.getRealTile(p).isGround() || p.getX() == targetLocation.getX() && p.getY() == targetLocation.getY()) {
                 continue;
             }
             return false;
@@ -51,9 +52,9 @@ public abstract class CreatureAI {
         return true;
     }
 
-    public void onEnter(int x, int y, int z, Tile tile) {
+    public void onEnter(Point location, Tile tile) {
         if (tile.isGround()) {
-            creature.setLocation(new Point(x, y, z));
+            creature.setLocation(location);
         } else {
             creature.doEvent("bump into a wall");
         }
@@ -67,18 +68,17 @@ public abstract class CreatureAI {
         int mx = (int) (Math.random() * 3) - 1;
         int my = (int) (Math.random() * 3) - 1;
 
-        Creature other = creature.getWorldCreature(creature.getLocation().getX() + mx,
-                creature.getLocation().getY() + my,
-                creature.getLocation().getZ());
+        Point vector = new Point(mx, my, 0);
+        Creature other = creature.getWorldCreature(creature.getLocation().add(vector));
 
         if (other != null && other.getGlyph() == creature.getGlyph()) {
             return;
         } else {
-            creature.moveBy(new Point(mx, my, 0));
+            creature.moveBy(vector);
         }
     }
 
-    public Tile getRememberedTile(int wx, int wy, int wz) {
+    public Tile getRememberedTile(Point rememberedTile) {
         return Tile.UNKNOWN;
     }
 
